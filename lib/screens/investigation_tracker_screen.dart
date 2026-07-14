@@ -334,7 +334,7 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
 
   Widget _buildDesktopLayout(BuildContext context) {
     return DesktopLayoutWrapper(
-      activeMenu: 'Cases',
+      activeMenu: 'Police Visits',
       child: Theme(
         data: ThemeData(
           brightness: Brightness.light,
@@ -345,7 +345,7 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Investigation Tracker',
+                'Police Visits',
                 style: TextStyle(
                   color: Color(0xFF0F1E36),
                   fontSize: 20,
@@ -357,17 +357,142 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
               const SizedBox(height: 32),
               _buildActionButtonsRow(),
               const SizedBox(height: 32),
-              Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  width: 580,
-                  child: _buildTimelineList(),
-                ),
-              ),
+              _buildDesktopTimeline(),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopTimeline() {
+    List<Widget> rows = [];
+    for (int i = 0; i < _timelineItems.length; i += 3) {
+      int end = (i + 3 < _timelineItems.length) ? i + 3 : _timelineItems.length;
+      List<Map<String, dynamic>> sublist = _timelineItems.sublist(i, end);
+      rows.add(_buildDesktopTimelineRow(sublist));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: rows,
+    );
+  }
+
+  Widget _buildDesktopTimelineRow(List<Map<String, dynamic>> items) {
+    List<Widget> children = [];
+    for (int i = 0; i < items.length; i++) {
+      children.add(
+        Expanded(
+          child: _buildDesktopTimelineItem(items[i]),
+        ),
+      );
+      if (i < items.length - 1) {
+        children.add(const SizedBox(width: 8));
+        children.add(
+          Container(
+            width: 48,
+            height: 1.5,
+            color: items[i]['status'] == 'completed' ? Colors.black : const Color(0xFFD1D5DB),
+          ),
+        );
+        children.add(const SizedBox(width: 8));
+      }
+    }
+    while (children.length < 5) {
+      children.add(const SizedBox(width: 8));
+      children.add(const Expanded(child: SizedBox.shrink()));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 40.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: children,
+      ),
+    );
+  }
+
+  Widget _buildDesktopTimelineItem(Map<String, dynamic> item) {
+    final title = item['title'] as String;
+    final date = item['date'] as String;
+    final subtitle = item['subtitle'] as String;
+    final status = item['status'] as String;
+
+    Widget dot;
+    if (status == 'completed') {
+      dot = Container(
+        width: 24,
+        height: 24,
+        decoration: const BoxDecoration(
+          color: Colors.black,
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.check, color: Colors.white, size: 14),
+      );
+    } else if (status == 'current') {
+      dot = Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: Colors.orange, width: 6.0),
+        ),
+      );
+    } else {
+      dot = Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFFD1D5DB), width: 2.0),
+        ),
+      );
+    }
+
+    final isPending = status == 'pending';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        dot,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: isPending ? const Color(0xFF9CA3AF) : const Color(0xFF0F1E36),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              if (date.isNotEmpty && date != 'Pending')
+                Text(
+                  date,
+                  style: TextStyle(
+                    color: isPending ? const Color(0xFFD1D5DB) : const Color(0xFF6B7280),
+                    fontSize: 11,
+                  ),
+                ),
+              if (subtitle.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: isPending ? const Color(0xFFD1D5DB) : const Color(0xFF9CA3AF),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 

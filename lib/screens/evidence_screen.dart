@@ -322,7 +322,7 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
 
   Widget _buildDesktopLayout(BuildContext context) {
     return DesktopLayoutWrapper(
-      activeMenu: 'Cases',
+      activeMenu: 'Police Visits',
       child: Theme(
         data: ThemeData(
           brightness: Brightness.light,
@@ -333,7 +333,7 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Evidence Repository',
+                'Police Visits',
                 style: TextStyle(
                   color: Color(0xFF0F1E36),
                   fontSize: 20,
@@ -345,53 +345,293 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
               const SizedBox(height: 32),
               _buildActionButtonsRow(),
               const SizedBox(height: 32),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'CATEGORIES',
-                          style: TextStyle(
-                            color: Color(0xFF4B5563),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildCategoriesGrid(),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'RECENT EVIDENCE',
-                          style: TextStyle(
-                            color: Color(0xFF4B5563),
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        ..._recentEvidence.map((ev) => _buildEvidenceCard(ev)),
-                      ],
-                    ),
-                  ),
-                ],
+              const Text(
+                'CATEGORIES',
+                style: TextStyle(
+                  color: Color(0xFF4B5563),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
+              const SizedBox(height: 16),
+              _buildDesktopCategoriesRow(),
+              const SizedBox(height: 32),
+              const Text(
+                'RECENT EVIDENCE',
+                style: TextStyle(
+                  color: Color(0xFF4B5563),
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildDesktopRecentEvidenceGrid(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopCategoriesRow() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: _categories.map((cat) {
+          final name = cat['name'] as String;
+          final count = cat['count'] as int;
+          final icon = cat['icon'] as IconData;
+          final color = cat['color'] as Color;
+          final iconColor = cat['iconColor'] as Color;
+
+          return Container(
+            width: 110,
+            height: 110,
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(icon, color: iconColor, size: 18),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF374151),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  child: Text(
+                    count.toString(),
+                    style: const TextStyle(
+                      color: Color(0xFF2563EB),
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildDesktopRecentEvidenceGrid() {
+    List<Widget> leftCol = [];
+    List<Widget> rightCol = [];
+    for (int i = 0; i < _recentEvidence.length; i++) {
+      if (i % 2 == 0) {
+        leftCol.add(_buildDesktopEvidenceCard(_recentEvidence[i]));
+      } else {
+        rightCol.add(_buildDesktopEvidenceCard(_recentEvidence[i]));
+      }
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: leftCol,
+          ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rightCol,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopEvidenceCard(Map<String, dynamic> ev) {
+    final title = ev['title'] as String;
+    final subtitle = ev['subtitle'] as String;
+    final meta = ev['meta'] as String;
+    final date = ev['date'] as String;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Color(0xFF374151),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                date,
+                style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 11),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              color: Color(0xFF0F1E36),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.info_outline, color: Colors.grey, size: 13),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  meta,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(color: Color(0xFFE5E7EB), height: 1),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFE5E7EB)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.remove_red_eye_outlined, color: Color(0xFF374151), size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        'Preview',
+                        style: TextStyle(
+                          color: Color(0xFF374151),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFE5E7EB)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.download_outlined, color: Color(0xFF374151), size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        'Download',
+                        style: TextStyle(
+                          color: Color(0xFF374151),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFE5E7EB)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.share_outlined, color: Color(0xFF374151), size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        'Share',
+                        style: TextStyle(
+                          color: Color(0xFF374151),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
