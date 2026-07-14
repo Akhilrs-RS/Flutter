@@ -14,7 +14,7 @@ class APMSNotificationsScreen extends StatefulWidget {
 class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
   String _selectedFilter = 'All';
 
-  final List<String> _filters = ['All', 'Hearings', 'Police', 'Payments', 'Docs'];
+  final List<String> _filters = ['All', 'Hearings', 'Police', 'Payments', 'Due'];
 
   final List<NotificationItem> _allNotifications = const [
     NotificationItem(
@@ -90,6 +90,9 @@ class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
   Widget _buildMobileLayout(BuildContext context) {
     final filteredNotifications = _allNotifications.where((n) {
       if (_selectedFilter == 'All') return true;
+      if (_selectedFilter == 'Due') {
+        return n.type == 'Docs' || n.type == 'Reminder';
+      }
       return n.type == _selectedFilter;
     }).toList();
 
@@ -273,11 +276,15 @@ class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
   Widget _buildDesktopLayout(BuildContext context) {
     final filteredNotifications = _allNotifications.where((n) {
       if (_selectedFilter == 'All') return true;
+      if (_selectedFilter == 'Due') {
+        return n.type == 'Docs' || n.type == 'Reminder';
+      }
       return n.type == _selectedFilter;
     }).toList();
 
     return DesktopLayoutWrapper(
       activeMenu: 'Notifications',
+      searchHintText: 'Search for hearings...',
       child: Theme(
         data: ThemeData(
           brightness: Brightness.light,
@@ -287,15 +294,6 @@ class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Notifications',
-                style: TextStyle(
-                  color: Color(0xFF0F1E36),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 24),
               Row(
                 children: _filters.map((filter) {
                   return GestureDetector(
@@ -311,7 +309,7 @@ class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               ...filteredNotifications.map((n) => NotificationListItemCard(item: n)),
             ],
           ),

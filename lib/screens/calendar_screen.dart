@@ -229,51 +229,421 @@ class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Court Hearings',
-                    style: TextStyle(
-                      color: Color(0xFF0F1E36),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (_currentView == 'Week')
+              if (_currentView == 'Week') ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
+                        elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
-                      child: const Text(
-                        '+ New Hearing',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.add, color: Colors.white, size: 14),
+                          SizedBox(width: 6),
+                          Text(
+                            'New Hearing',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              if (_currentView == 'Week') ...[
-                _buildWeekCalendarCard(),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _currentView = 'Month';
+                        });
+                      },
+                      child: Row(
+                        children: const [
+                          Text(
+                            'View full calendar',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_ios, color: Colors.blue, size: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 24),
-                _buildWeekHearingsList(),
+                _buildDesktopWeekCalendarCard(),
+                const SizedBox(height: 24),
+                _buildDesktopWeekHearingsList(),
               ] else ...[
-                _buildMonthSelectorRow(),
-                const SizedBox(height: 20),
-                _buildMonthCalendarCard(),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.keyboard_arrow_left, color: Color(0xFF0F1E36), size: 24),
+                      onPressed: () {
+                        setState(() {
+                          _currentView = 'Week';
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 24),
+                    _buildDesktopMonthViewTab('Day', false),
+                    _buildDesktopMonthViewTab('Week', false, onTap: () {
+                      setState(() {
+                        _currentView = 'Week';
+                      });
+                    }),
+                    _buildDesktopMonthViewTab('Month', true),
+                    _buildDesktopMonthViewTab('Agenda', false),
+                  ],
+                ),
                 const SizedBox(height: 24),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildDesktopMonthCalendarCard(),
+                    ),
+                    const SizedBox(width: 24),
+                    _buildDesktopLegendCard(),
+                  ],
+                ),
+                const SizedBox(height: 32),
                 _buildMonthEventsList(),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopMonthViewTab(String label, bool active, {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 32),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: active ? Colors.black : Colors.transparent,
+              width: 2,
+            ),
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: active ? Colors.black : const Color(0xFF6B7280),
+            fontSize: 14,
+            fontWeight: active ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopWeekCalendarCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: const [
+                  Text(
+                    'September 2023',
+                    style: TextStyle(
+                      color: Color(0xFF0F1E36),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.keyboard_arrow_left, color: Color(0xFF6B7280), size: 20),
+                  Icon(Icons.keyboard_arrow_right, color: Color(0xFF6B7280), size: 20),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildWeekDayItem('Mon', '11', false),
+              _buildWeekDayItem('Tue', '12', false),
+              _buildWeekDayItem('Wed', '13', true),
+              _buildWeekDayItem('Thu', '14', false),
+              _buildWeekDayItem('Fri', '15', false),
+              _buildWeekDayItem('Sat', '16', false),
+              _buildWeekDayItem('Sun', '17', false),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopWeekHearingsList() {
+    final hearings = [
+      _buildHearingDetailCard(
+        time: '10:30',
+        period: 'AM',
+        caseNo: 'Case #2934-22',
+        title: 'Smith vs. Global Dynamics',
+        court: 'Supreme Court, Room 402',
+        judge: 'Hon. Justice Elena Rodriguez',
+        tag1: 'Cross Examination',
+        tag1Bg: const Color(0xFFEFF6FF),
+        tag1Text: const Color(0xFF2563EB),
+        tag2: 'Confirmed',
+        tag2Bg: const Color(0xFFD1FAE5),
+        tag2Text: const Color(0xFF059669),
+        accentColor: const Color(0xFF10B981),
+        showMarkDone: true,
+        firstButtonLabel: 'Update Status',
+      ),
+      _buildHearingDetailCard(
+        time: '02:15',
+        period: 'PM',
+        caseNo: 'Case #8120-23',
+        title: 'State vs. Marcus Vance',
+        court: 'District Court, Hall B',
+        judge: 'Judge Theodore Wright',
+        tag1: 'Plea & Motion',
+        tag1Bg: const Color(0xFFEFF6FF),
+        tag1Text: const Color(0xFF3B82F6),
+        tag2: 'Pending',
+        tag2Bg: const Color(0xFFFEF3C7),
+        tag2Text: const Color(0xFFD97706),
+        accentColor: Colors.orange,
+        showMarkDone: true,
+        firstButtonLabel: 'Reschedule',
+      ),
+      _buildHearingDetailCard(
+        time: '04:45',
+        period: 'PM',
+        caseNo: 'Case #5541-21',
+        title: 'Riverside HOA vs. Park',
+        court: 'Civil Court, Room 12',
+        judge: 'Judge Sarah Miller',
+        tag1: 'Bail List',
+        tag1Bg: const Color(0xFFEFF6FF),
+        tag1Text: const Color(0xFF3B82F6),
+        tag2: 'Adjourned',
+        tag2Bg: const Color(0xFFF3F4F6),
+        tag2Text: const Color(0xFF6B7280),
+        accentColor: const Color(0xFF9CA3AF),
+        showMarkDone: false,
+        firstButtonLabel: 'Reschedule',
+      ),
+    ];
+
+    List<Widget> leftCol = [];
+    List<Widget> rightCol = [];
+    for (int i = 0; i < hearings.length; i++) {
+      if (i % 2 == 0) {
+        leftCol.add(hearings[i]);
+      } else {
+        rightCol.add(hearings[i]);
+      }
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: leftCol,
+          ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rightCol,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopMonthCalendarCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_left, color: Color(0xFF6B7280), size: 24),
+                onPressed: () {
+                  setState(() {
+                    _currentView = 'Week';
+                  });
+                },
+              ),
+              const Expanded(
+                child: Text(
+                  'September 2023',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF0F1E36),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.keyboard_arrow_right, color: Color(0xFF6B7280), size: 24),
+                onPressed: () {},
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: const [
+              Text('Sun', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Mon', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Tue', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Wed', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Thu', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Fri', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+              Text('Sat', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 10,
+              childAspectRatio: 1.2,
+            ),
+            itemCount: _monthDays.length,
+            itemBuilder: (context, index) {
+              final dayMap = _monthDays[index];
+              final day = dayMap['day'] as int?;
+              final List<Color> dots = dayMap['dots'] as List<Color>;
+
+              if (day == null) return const SizedBox.shrink();
+
+              final isSelected = day == 13;
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: isSelected ? const Color(0xFF1E3A8A) : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      day.toString(),
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : const Color(0xFF0F1E36),
+                        fontSize: 14,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: dots.map((color) => Container(
+                      width: 5,
+                      height: 5,
+                      margin: const EdgeInsets.symmetric(horizontal: 1.0),
+                      decoration: BoxDecoration(
+                        color: color,
+                        shape: BoxShape.circle,
+                      ),
+                    )).toList(),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLegendCard() {
+    return Container(
+      width: 240,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDesktopLegendItem('Bail', Colors.blue),
+          const SizedBox(height: 16),
+          _buildDesktopLegendItem('Visits', Colors.orange),
+          const SizedBox(height: 16),
+          _buildDesktopLegendItem('Hearings', Colors.green),
+          const SizedBox(height: 16),
+          _buildDesktopLegendItem('Client', Colors.red),
+          const SizedBox(height: 16),
+          _buildDesktopLegendItem('Consultations', const Color(0xFF1E3A8A)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDesktopLegendItem(String label, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Color(0xFF374151),
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 
@@ -447,6 +817,7 @@ class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
     required Color tag2Text,
     required Color accentColor,
     required bool showMarkDone,
+    String firstButtonLabel = 'Reschedule',
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -601,9 +972,9 @@ class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
-                            child: const Text(
-                              'Reschedule',
-                              style: TextStyle(
+                            child: Text(
+                              firstButtonLabel,
+                              style: const TextStyle(
                                 color: Color(0xFF374151),
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

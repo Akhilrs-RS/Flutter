@@ -321,6 +321,46 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
   }
 
   Widget _buildDesktopLayout(BuildContext context) {
+    final visits = [
+      _buildVisitCard(
+        title: 'Andheri Police Station',
+        subtitle: 'IO Rajesh Patil',
+        tagText: 'Scheduled',
+        tagBgColor: const Color(0xFFE0F2FE),
+        tagTextColor: const Color(0xFF0369A1),
+        caseInfo: 'CR-2026-047 . Jan 10, 2026',
+        timeInfo: '02:00 PM . Witness statement',
+      ),
+      _buildVisitCard(
+        title: 'Bandra PS',
+        subtitle: 'IO Meera Nair',
+        tagText: 'Completed',
+        tagBgColor: const Color(0xFFD1FAE5),
+        tagTextColor: const Color(0xFF065F46),
+        caseInfo: 'MV-2025-089 . Jul 05, 2025',
+        timeInfo: '11:00 AM . FIR copy collection',
+      ),
+      _buildVisitCard(
+        title: 'Kurla PS',
+        subtitle: 'IO Suresh Yadav',
+        tagText: 'Pending',
+        tagBgColor: const Color(0xFFFEF3C7),
+        tagTextColor: const Color(0xFFD97706),
+        caseInfo: 'CR-2025-099 . Jul 14, 2026',
+        timeInfo: '10:00 AM . Evidence submission',
+      ),
+    ];
+
+    List<Widget> leftCol = [];
+    List<Widget> rightCol = [];
+    for (int i = 0; i < visits.length; i++) {
+      if (i % 2 == 0) {
+        leftCol.add(visits[i]);
+      } else {
+        rightCol.add(visits[i]);
+      }
+    }
+
     return DesktopLayoutWrapper(
       activeMenu: 'Police Visits',
       child: Theme(
@@ -332,78 +372,65 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const Text(
+                'Police Visits',
+                style: TextStyle(
+                  color: Color(0xFF0F1E36),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _buildTopTabs(context, 'Visits'),
+              const SizedBox(height: 32),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Police Visits',
-                    style: TextStyle(
-                      color: Color(0xFF0F1E36),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: leftCol,
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    child: const Text(
-                      '+ Schedule Visit',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: rightCol,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-              _buildTopTabs(context, 'Visits'),
-              const SizedBox(height: 32),
-              Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                children: [
-                  SizedBox(
-                    width: 340,
-                    child: _buildVisitCard(
-                      title: 'Andheri Police Station',
-                      subtitle: 'IO Rajesh Patil',
-                      tagText: 'Scheduled',
-                      tagBgColor: const Color(0xFFE0F2FE),
-                      tagTextColor: const Color(0xFF0369A1),
-                      caseInfo: 'CR-2026-047 . Jan 10, 2026',
-                      timeInfo: '02:00 PM . Witness statement',
-                    ),
+              Container(
+                width: double.infinity,
+                height: 52,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0xFF9CA3AF),
+                    width: 1.2,
                   ),
-                  SizedBox(
-                    width: 340,
-                    child: _buildVisitCard(
-                      title: 'Bandra PS',
-                      subtitle: 'IO Meera Nair',
-                      tagText: 'Completed',
-                      tagBgColor: const Color(0xFFD1FAE5),
-                      tagTextColor: const Color(0xFF065F46),
-                      caseInfo: 'MV-2025-089 . Jul 05, 2025',
-                      timeInfo: '11:00 AM . FIR copy collection',
-                    ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.add, color: Color(0xFF374151), size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Schedule New Police Visit',
+                        style: TextStyle(
+                          color: Color(0xFF374151),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    width: 340,
-                    child: _buildVisitCard(
-                      title: 'Kurla PS',
-                      subtitle: 'IO Suresh Yadav',
-                      tagText: 'Pending',
-                      tagBgColor: const Color(0xFFFEF3C7),
-                      tagTextColor: const Color(0xFFD97706),
-                      caseInfo: 'CR-2025-099 . Jul 14, 2026',
-                      timeInfo: '10:00 AM . Evidence submission',
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),

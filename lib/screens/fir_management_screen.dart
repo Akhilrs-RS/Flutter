@@ -263,7 +263,7 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
 
   Widget _buildDesktopLayout(BuildContext context) {
     return DesktopLayoutWrapper(
-      activeMenu: 'Cases',
+      activeMenu: 'Police Visits',
       child: Theme(
         data: ThemeData(
           brightness: Brightness.light,
@@ -274,7 +274,7 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'FIR Management',
+                'Police Visits',
                 style: TextStyle(
                   color: Color(0xFF0F1E36),
                   fontSize: 20,
@@ -284,16 +284,197 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
               const SizedBox(height: 24),
               _buildTopTabs(context, 'FIR Management'),
               const SizedBox(height: 32),
-              Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                  width: 580,
-                  child: _buildFIRDetailsCard(),
-                ),
+              _buildDesktopFIRCard(),
+              const SizedBox(height: 32),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.cloud_upload_outlined, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'Upload FIR Copy',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE5E7EB),
+                        foregroundColor: const Color(0xFF374151),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.remove_red_eye_outlined, size: 18),
+                          SizedBox(width: 8),
+                          Text(
+                            'View Copy',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopFIRCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Red Alert Status Bar
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF2F2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFFCA5A5), width: 1.0),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFEE2E2),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'FIR No. 2026/047',
+                        style: TextStyle(
+                          color: Color(0xFF0F1E36),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Andheri Police Station',
+                            style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFEF3C7),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            child: const Text(
+                              'Under Investigation',
+                              style: TextStyle(
+                                color: Color(0xFFD97706),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 32),
+          // Split columns for FIR Details and Parties Involved
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'FIR DETAILS',
+                      style: TextStyle(
+                        color: Color(0xFF4B5563),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildMetaRow('FIR Number', '2026/047'),
+                    _buildMetaRow('Police Station', 'Andheri Police Station'),
+                    _buildMetaRow('Officer Incharge', 'Ramesh Patil'),
+                    _buildMetaRow('FIR Date', 'January 10, 2026'),
+                    _buildMetaRow('IPC Section', 'IPC 302, 34'),
+                    _buildMetaRow('Complaint Type', 'Cognizable Offence'),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 48),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'STATUS OVERVIEW',
+                      style: TextStyle(
+                        color: Color(0xFF4B5563),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildPartyRow('Complainant', 'Rajan Sharma', isLink: true),
+                    _buildPartyRow('Accused', 'Suresh Rao', isRed: true),
+                    _buildPartyRow('Witnesses', '3 witnesses recorded', isLink: true),
+                    _buildPartyRow('Evidence', '12 items collected', isLink: true),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

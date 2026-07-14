@@ -325,6 +325,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       foregroundColor: Colors.white,
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -354,20 +355,42 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 32),
-              Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                children: filteredHearings.map((h) {
-                  return SizedBox(
-                    width: 340,
-                    child: _buildHearingCard(h),
-                  );
-                }).toList(),
-              ),
+              _buildDesktopHearingsGrid(filteredHearings),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopHearingsGrid(List<Map<String, dynamic>> hearings) {
+    List<Widget> leftCol = [];
+    List<Widget> rightCol = [];
+    for (int i = 0; i < hearings.length; i++) {
+      if (i % 2 == 0) {
+        leftCol.add(_buildHearingCard(hearings[i]));
+      } else {
+        rightCol.add(_buildHearingCard(hearings[i]));
+      }
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: leftCol,
+          ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rightCol,
+          ),
+        ),
+      ],
     );
   }
 
@@ -397,155 +420,169 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
       ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  '$caseNo  .  $client',
-                  style: const TextStyle(
-                    color: Color(0xFF0F1E36),
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: tagBgColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Text(
-                  tag,
-                  style: TextStyle(
-                    color: tagTextColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.gavel_outlined, color: Colors.grey, size: 14),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  court,
-                  style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.access_time_outlined, color: Colors.grey, size: 14),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  time,
-                  style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Divider(color: Color(0xFFE5E7EB), height: 1),
-          const SizedBox(height: 12),
-          if (isCompleted) ...[
-            if (note != null)
-              Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    note,
-                    style: const TextStyle(
-                      color: Color(0xFF065F46),
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '$caseNo  .  $client',
+                          style: const TextStyle(
+                            color: Color(0xFF0F1E36),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: tagBgColor,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text(
+                          tag,
+                          style: TextStyle(
+                            color: tagTextColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.gavel_outlined, color: Colors.grey, size: 14),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          court,
+                          style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time_outlined, color: Colors.grey, size: 14),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          time,
+                          style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!isCompleted) ...[
+                    const SizedBox(height: 16),
+                    const Divider(color: Color(0xFFE5E7EB), height: 1),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            child: const Text(
+                              'Update Outcome',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFE5E7EB)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            child: const Text(
+                              'Add Order',
+                              style: TextStyle(
+                                color: Color(0xFF374151),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFFE5E7EB)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            child: const Text(
+                              'Navigate',
+                              style: TextStyle(
+                                color: Color(0xFF374151),
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-          ] else ...[
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: const Text(
-                      'Update Outcome',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFE5E7EB)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: const Text(
-                      'Add Order',
-                      style: TextStyle(
-                        color: Color(0xFF374151),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFE5E7EB)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                    child: const Text(
-                      'Navigate',
-                      style: TextStyle(
-                        color: Color(0xFF374151),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
+            if (isCompleted && note != null)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFDCFCE7),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      note,
+                      style: const TextStyle(
+                        color: Color(0xFF15803D),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
-        ],
+        ),
       ),
     );
   }

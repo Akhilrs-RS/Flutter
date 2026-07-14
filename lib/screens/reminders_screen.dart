@@ -258,7 +258,7 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
 
   Widget _buildDesktopLayout(BuildContext context) {
     return DesktopLayoutWrapper(
-      activeMenu: 'Calendar',
+      activeMenu: 'Tasks',
       child: Theme(
         data: ThemeData(
           brightness: Brightness.light,
@@ -268,47 +268,241 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Reminders',
-                    style: TextStyle(
-                      color: Color(0xFF0F1E36),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                    child: const Text(
-                      '+ Create Task',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-              Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                children: _reminders.map((r) {
-                  return SizedBox(
-                    width: 340,
-                    child: _buildReminderCard(r),
-                  );
-                }).toList(),
-              ),
+              _buildDesktopRemindersGrid(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopRemindersGrid() {
+    List<Widget> leftCol = [];
+    List<Widget> rightCol = [];
+    for (int i = 0; i < _reminders.length; i++) {
+      if (i % 2 == 0) {
+        leftCol.add(_buildDesktopReminderCard(_reminders[i]));
+      } else {
+        rightCol.add(_buildDesktopReminderCard(_reminders[i]));
+      }
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: leftCol,
+          ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: rightCol,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopReminderCard(Map<String, dynamic> r) {
+    final title = r['title'] as String;
+    final priority = r['priority'] as String;
+    final priorityBg = r['priorityBg'] as Color;
+    final priorityText = r['priorityText'] as Color;
+    final time = r['time'] as String;
+    final tag = r['tag'] as String;
+    final tagBg = r['tagBg'] as Color;
+    final tagText = r['tagText'] as Color;
+    final subtitle = r['subtitle'] as String;
+    final isCompleted = r['isCompleted'] as bool;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            color: const Color(0xFF0F1E36),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                          ),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: tagBg,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            child: Text(
+                              tag,
+                              style: TextStyle(
+                                color: tagText,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: priorityBg,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            child: Text(
+                              priority,
+                              style: TextStyle(
+                                color: priorityText,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.access_time_outlined, color: Colors.grey, size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        time,
+                        style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.person_outline, color: Colors.grey, size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  if (!isCompleted) ...[
+                    const SizedBox(height: 16),
+                    const Divider(color: Color(0xFFE5E7EB), height: 1),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.check, size: 14),
+                          label: const Text('Complete'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.edit_outlined, size: 14),
+                          label: const Text('Edit'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFEF3C7),
+                            foregroundColor: const Color(0xFFD97706),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.delete_outline, size: 14),
+                          label: const Text('Delete'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFDBEAFE),
+                            foregroundColor: const Color(0xFF2563EB),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFEE2E2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Color(0xFFDC2626), size: 14),
+                            onPressed: () {},
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (isCompleted)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFDCFCE7),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: const [
+                    Icon(Icons.check_circle, color: Color(0xFF10B981), size: 16),
+                    SizedBox(width: 8),
+                    Text(
+                      'Completed',
+                      style: TextStyle(
+                        color: Color(0xFF15803D),
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );

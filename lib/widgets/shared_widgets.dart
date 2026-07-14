@@ -5,6 +5,8 @@ import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/clients_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/screens/police_visits_screen.dart';
+import 'package:advocate_app/screens/reminders_screen.dart';
 
 class OverviewCard extends StatelessWidget {
   final IconData icon;
@@ -1093,6 +1095,88 @@ class NotificationListItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 1024;
+
+    if (isDesktop) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x05000000),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            // Left Circle Icon Container
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: item.iconBgColor,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.icon,
+                color: item.iconColor,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Text Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.title,
+                    style: const TextStyle(
+                      color: Color(0xFF0F1E36),
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.subtitle,
+                    style: const TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            // Right Chevron and Unread Dot
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: Colors.blue.shade700,
+              size: 22,
+            ),
+            if (item.isUnread) ...[
+              const SizedBox(width: 8),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -1493,9 +1577,9 @@ class DesktopSidebar extends StatelessWidget {
                 _buildMenuItem(context, 'Hearings', Icons.gavel_outlined, const APMSCalendarScreen()),
                 _buildMenuItem(context, 'Calendar', Icons.calendar_month_outlined, const APMSCalendarScreen()),
                 _buildMenuItem(context, 'Documents', Icons.description_outlined, null),
-                _buildMenuItem(context, 'Billing', Icons.currency_rupee, null),
-                _buildMenuItem(context, 'Police Visits', Icons.shield_outlined, null),
-                _buildMenuItem(context, 'Tasks', Icons.checklist_outlined, null),
+                _buildMenuItem(context, 'Notifications', Icons.notifications_none_outlined, const APMSNotificationsScreen()),
+                _buildMenuItem(context, 'Police Visits', Icons.shield_outlined, const APMSPoliceVisitsScreen()),
+                _buildMenuItem(context, 'Tasks', Icons.checklist_outlined, const APMSRemindersScreen()),
                 _buildMenuItem(context, 'Reports', Icons.analytics_outlined, null),
               ],
             ),
@@ -1554,7 +1638,8 @@ class DesktopSidebar extends StatelessWidget {
 }
 
 class DesktopHeader extends StatelessWidget {
-  const DesktopHeader({super.key});
+  final String? searchHintText;
+  const DesktopHeader({super.key, this.searchHintText});
 
   @override
   Widget build(BuildContext context) {
@@ -1597,15 +1682,15 @@ class DesktopHeader extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              children: const [
-                Icon(Icons.search, color: Colors.grey, size: 18),
-                SizedBox(width: 8),
+              children: [
+                const Icon(Icons.search, color: Colors.grey, size: 18),
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    style: TextStyle(color: Colors.black, fontSize: 13),
+                    style: const TextStyle(color: Colors.black, fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Search for a service...',
-                      hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+                      hintText: searchHintText ?? 'Search for a service...',
+                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
@@ -1666,11 +1751,13 @@ class DesktopHeader extends StatelessWidget {
 class DesktopLayoutWrapper extends StatelessWidget {
   final String activeMenu;
   final Widget child;
+  final String? searchHintText;
 
   const DesktopLayoutWrapper({
     super.key,
     required this.activeMenu,
     required this.child,
+    this.searchHintText,
   });
 
   @override
@@ -1683,7 +1770,7 @@ class DesktopLayoutWrapper extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                const DesktopHeader(),
+                DesktopHeader(searchHintText: searchHintText),
                 Expanded(
                   child: SingleChildScrollView(
                     child: child,
