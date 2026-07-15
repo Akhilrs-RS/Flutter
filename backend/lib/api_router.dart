@@ -9,17 +9,7 @@ class ApiRouter {
   Router get router {
     final router = Router();
 
-    // CORS preflight helper
-    router.all('/<ignored|.*>', (Request request) {
-      if (request.method == 'OPTIONS') {
-        return Response.ok('', headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept, Authorization',
-        });
-      }
-      return Response.notFound('Not Found');
-    });
+
 
     // 1. Cases endpoints
     router.get('/api/cases', (Request request) {
