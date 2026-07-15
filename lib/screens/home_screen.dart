@@ -11,9 +11,113 @@ import 'package:advocate_app/screens/police_visits_screen.dart';
 import 'package:advocate_app/screens/court_hearings_screen.dart';
 import 'package:advocate_app/screens/reminders_screen.dart';
 import 'package:advocate_app/screens/evidence_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
-class APMSHomeScreen extends StatelessWidget {
+class APMSHomeScreen extends StatefulWidget {
   const APMSHomeScreen({super.key});
+
+  @override
+  State<APMSHomeScreen> createState() => _APMSHomeScreenState();
+}
+
+class _APMSHomeScreenState extends State<APMSHomeScreen> {
+  int _activeCasesCount = 47;
+  int _todayHearingsCount = 6;
+  int _policeVisitsCount = 3;
+  int _clientMeetingsCount = 4;
+  final String _pendingPaymentsAmount = "₹2.4L";
+  int _pendingTasksCount = 12;
+
+  List<Map<String, dynamic>> _todaySchedule = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDashboardData();
+  }
+
+  void _fetchDashboardData() async {
+    final cases = await ApiService.getCases();
+    final hearings = await ApiService.getHearings();
+    final visits = await ApiService.getVisits();
+    final reminders = await ApiService.getReminders();
+    final clients = await ApiService.getClients();
+
+    if (mounted) {
+      setState(() {
+        if (cases.isNotEmpty) {
+          _activeCasesCount = cases.where((c) => c['status'] == 'Active').length;
+        }
+        if (hearings.isNotEmpty) {
+          _todayHearingsCount = hearings.where((h) => h['isToday'] == true).length;
+        }
+        if (visits.isNotEmpty) {
+          _policeVisitsCount = visits.where((v) => v['tagText'] != 'Completed').length;
+        }
+        if (clients.isNotEmpty) {
+          _clientMeetingsCount = clients.length;
+        }
+        if (reminders.isNotEmpty) {
+          _pendingTasksCount = reminders.where((r) => r['isCompleted'] == false).length;
+        }
+        
+        // Let's populate the today's schedule section
+        final List<Map<String, dynamic>> schedule = [];
+        for (var h in hearings) {
+          if (h['isToday'] == true) {
+            schedule.add({
+              'time': '${h['time'] ?? ''} ${h['period'] ?? ''}',
+              'title': h['title'] as String,
+              'subtitle': h['court'] as String,
+              'tag': 'Hearing',
+              'color': Colors.blue,
+            });
+          }
+        }
+        for (var v in visits) {
+          if (v['tagText'] == 'Scheduled') {
+            schedule.add({
+              'time': (v['timeInfo'] as String).split(' . ').first,
+              'title': v['title'] as String,
+              'subtitle': v['subtitle'] as String,
+              'tag': 'Police',
+              'color': Colors.orange,
+            });
+          }
+        }
+        
+        if (schedule.isNotEmpty) {
+          _todaySchedule = schedule;
+        } else {
+          _todaySchedule = List<Map<String, dynamic>>.from(_mockSchedule);
+        }
+      });
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockSchedule = const [
+    {
+      'time': '10:30 AM',
+      'title': 'Sharma vs State',
+      'subtitle': 'Sessions Court – Hall 4',
+      'tag': 'Hearing',
+      'color': Colors.blue,
+    },
+    {
+      'time': '02:00 PM',
+      'title': 'FIR Review – Patel',
+      'subtitle': 'Andheri PS – IO Desai',
+      'tag': 'Police',
+      'color': Colors.orange,
+    },
+    {
+      'time': '04:30 PM',
+      'title': 'Mehta Consultation',
+      'subtitle': 'Office Meeting',
+      'tag': 'Meeting',
+      'color': Colors.teal,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -356,7 +460,7 @@ class APMSHomeScreen extends StatelessWidget {
                               icon: Icons.work_outline,
                               color: const Color(0xFFEFF6FF),
                               iconColor: Colors.blue,
-                              value: '47',
+                              value: _activeCasesCount.toString(),
                               label: 'Active Cases',
                             ),
                           ),
@@ -368,11 +472,11 @@ class APMSHomeScreen extends StatelessWidget {
                                   MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
                                 );
                               },
-                              child: const OverviewCard(
+                              child: OverviewCard(
                                 icon: Icons.gavel_outlined,
-                                color: Color(0xFFF5F3FF),
+                                color: const Color(0xFFF5F3FF),
                                 iconColor: Colors.purple,
-                                value: '6',
+                                value: _todayHearingsCount.toString(),
                                 label: 'Today\'s Hearings',
                               ),
                             ),
@@ -385,11 +489,11 @@ class APMSHomeScreen extends StatelessWidget {
                                   MaterialPageRoute(builder: (context) => const APMSPoliceVisitsScreen()),
                                 );
                               },
-                              child: const OverviewCard(
+                              child: OverviewCard(
                                 icon: Icons.shield_outlined,
-                                color: Color(0xFFFFF7ED),
+                                color: const Color(0xFFFFF7ED),
                                 iconColor: Colors.orange,
-                                value: '3',
+                                value: _policeVisitsCount.toString(),
                                 label: 'Police Visits',
                               ),
                             ),
@@ -399,22 +503,22 @@ class APMSHomeScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: OverviewCard(
                               icon: Icons.people_outline,
-                              color: Color(0xFFECFDF5),
-                              iconColor: Color(0xFF10B981),
-                              value: '4',
+                              color: const Color(0xFFECFDF5),
+                              iconColor: const Color(0xFF10B981),
+                              value: _clientMeetingsCount.toString(),
                               label: 'Client Meetings',
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: OverviewCard(
                               icon: Icons.currency_rupee,
-                              color: Color(0xFFFEF2F2),
+                              color: const Color(0xFFFEF2F2),
                               iconColor: Colors.red,
-                              value: '₹2.4L',
+                              value: _pendingPaymentsAmount,
                               label: 'Pending Payments',
                             ),
                           ),
@@ -426,11 +530,11 @@ class APMSHomeScreen extends StatelessWidget {
                                   MaterialPageRoute(builder: (context) => const APMSRemindersScreen()),
                                 );
                               },
-                              child: const OverviewCard(
+                              child: OverviewCard(
                                 icon: Icons.access_time,
-                                color: Color(0xFFFEFCE8),
-                                iconColor: Color(0xFFD97706),
-                                value: '12',
+                                color: const Color(0xFFFEFCE8),
+                                iconColor: const Color(0xFFD97706),
+                                value: _pendingTasksCount.toString(),
                                 label: 'Pending Tasks',
                               ),
                             ),
@@ -540,34 +644,17 @@ class APMSHomeScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const ScheduleItem(
-                    time: '10:30 AM',
-                    title: 'Sharma vs State',
-                    subtitle: 'Sessions Court – Hall 4',
-                    tag: 'Hearing',
-                    color: Colors.blue,
-                    tagBgColor: Color(0xFFF3F4F6),
-                    tagTextColor: Color(0xFF4B5563),
-                  ),
-                  const ScheduleItem(
-                    time: '02:00 PM',
-                    title: 'FIR Review – Patel',
-                    subtitle: 'Andheri PS – IO Desai',
-                    tag: 'Police',
-                    color: Colors.orange,
-                    tagBgColor: Color(0xFFF3F4F6),
-                    tagTextColor: Color(0xFF4B5563),
-                  ),
-                  const ScheduleItem(
-                    time: '04:30 PM',
-                    title: 'Mehta Consultation',
-                    subtitle: 'Office Meeting',
-                    tag: 'Meeting',
-                    color: Colors.teal,
-                    tagBgColor: Color(0xFFF3F4F6),
-                    tagTextColor: Color(0xFF4B5563),
-                  ),
-                  const SizedBox(height: 8),
+                  ..._todaySchedule.map((item) {
+                    return ScheduleItem(
+                      time: item['time'] as String,
+                      title: item['title'] as String,
+                      subtitle: item['subtitle'] as String,
+                      tag: item['tag'] as String,
+                      color: item['color'] as Color,
+                      tagBgColor: const Color(0xFFF3F4F6),
+                      tagTextColor: const Color(0xFF4B5563),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -836,7 +923,7 @@ class APMSHomeScreen extends StatelessWidget {
                       icon: Icons.work_outline,
                       color: const Color(0xFFEFF6FF),
                       iconColor: Colors.blue,
-                      value: '47',
+                      value: _activeCasesCount.toString(),
                       label: 'Active Cases',
                     ),
                   ),
@@ -848,11 +935,11 @@ class APMSHomeScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
                         );
                       },
-                      child: const OverviewCard(
+                      child: OverviewCard(
                         icon: Icons.gavel_outlined,
-                        color: Color(0xFFF5F3FF),
+                        color: const Color(0xFFF5F3FF),
                         iconColor: Colors.purple,
-                        value: '6',
+                        value: _todayHearingsCount.toString(),
                         label: 'Today\'s Hearings',
                       ),
                     ),
@@ -865,32 +952,32 @@ class APMSHomeScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => const APMSPoliceVisitsScreen()),
                         );
                       },
-                      child: const OverviewCard(
+                      child: OverviewCard(
                         icon: Icons.shield_outlined,
-                        color: Color(0xFFFFF7ED),
+                        color: const Color(0xFFFFF7ED),
                         iconColor: Colors.orange,
-                        value: '3',
+                        value: _policeVisitsCount.toString(),
                         label: 'Police Visits',
                       ),
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: OverviewCard(
                       icon: Icons.people_outline,
-                      color: Color(0xFFECFDF5),
-                      iconColor: Color(0xFF10B981),
-                      value: '4',
+                      color: const Color(0xFFECFDF5),
+                      iconColor: const Color(0xFF10B981),
+                      value: _clientMeetingsCount.toString(),
                       label: 'Client Meetings',
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
+                  Expanded(
                     child: OverviewCard(
                       icon: Icons.currency_rupee,
-                      color: Color(0xFFFEF2F2),
+                      color: const Color(0xFFFEF2F2),
                       iconColor: Colors.red,
-                      value: '₹2.4L',
+                      value: _pendingPaymentsAmount,
                       label: 'Pending Payments',
                     ),
                   ),
@@ -902,11 +989,11 @@ class APMSHomeScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (context) => const APMSRemindersScreen()),
                         );
                       },
-                      child: const OverviewCard(
+                      child: OverviewCard(
                         icon: Icons.access_time,
-                        color: Color(0xFFFEFCE8),
-                        iconColor: Color(0xFFD97706),
-                        value: '12',
+                        color: const Color(0xFFFEFCE8),
+                        iconColor: const Color(0xFFD97706),
+                        value: _pendingTasksCount.toString(),
                         label: 'Pending Tasks',
                       ),
                     ),
@@ -1065,33 +1152,17 @@ class APMSHomeScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const ScheduleItem(
-                          time: '10:30 AM',
-                          title: 'Sharma vs State',
-                          subtitle: 'Sessions Court – Hall 4',
-                          tag: 'Hearing',
-                          color: Colors.blue,
-                          tagBgColor: Color(0xFFF3F4F6),
-                          tagTextColor: Color(0xFF4B5563),
-                        ),
-                        const ScheduleItem(
-                          time: '02:00 PM',
-                          title: 'FIR Review – Patel',
-                          subtitle: 'Andheri PS – IO Desai',
-                          tag: 'Police',
-                          color: Colors.orange,
-                          tagBgColor: Color(0xFFF3F4F6),
-                          tagTextColor: Color(0xFF4B5563),
-                        ),
-                        const ScheduleItem(
-                          time: '04:30 PM',
-                          title: 'Mehta Consultation',
-                          subtitle: 'Office Meeting',
-                          tag: 'Meeting',
-                          color: Colors.teal,
-                          tagBgColor: Color(0xFFF3F4F6),
-                          tagTextColor: Color(0xFF4B5563),
-                        ),
+                        ..._todaySchedule.map((item) {
+                          return ScheduleItem(
+                            time: item['time'] as String,
+                            title: item['title'] as String,
+                            subtitle: item['subtitle'] as String,
+                            tag: item['tag'] as String,
+                            color: item['color'] as Color,
+                            tagBgColor: const Color(0xFFF3F4F6),
+                            tagTextColor: const Color(0xFF4B5563),
+                          );
+                        }),
                       ],
                     ),
                   ),
