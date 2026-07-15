@@ -1496,16 +1496,21 @@ class DesktopSidebar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: InkWell(
         onTap: () {
-          if (isSelected) return;
+          debugPrint('Sidebar menu item tapped: $label');
+          if (isSelected) {
+            debugPrint('Menu item $label is already selected.');
+            return;
+          }
           if (targetScreen != null) {
-            Navigator.of(context).pushAndRemoveUntil(
+            Navigator.of(context).pushReplacement(
               PageRouteBuilder(
                 pageBuilder: (context, anim1, anim2) => targetScreen,
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),
-              (route) => false,
             );
+          } else {
+            debugPrint('No target screen defined for $label');
           }
         },
         borderRadius: BorderRadius.circular(10),
