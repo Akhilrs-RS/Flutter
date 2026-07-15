@@ -7,6 +7,7 @@ import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSFIRManagementScreen extends StatefulWidget {
   const APMSFIRManagementScreen({super.key});
@@ -16,6 +17,45 @@ class APMSFIRManagementScreen extends StatefulWidget {
 }
 
 class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
+  Map<String, dynamic> _firDetails = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchFIR();
+  }
+
+  void _fetchFIR() async {
+    final data = await ApiService.getFIRDetails();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _firDetails = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _firDetails = Map<String, dynamic>.from(_mockFirDetails);
+        });
+      }
+    }
+  }
+
+  final Map<String, dynamic> _mockFirDetails = const {
+    'firNumber': '2026/047',
+    'caseNumber': 'CR-2026/047/MH/084',
+    'policeStation': 'Andheri Police Station',
+    'firDate': 'January 10, 2026',
+    'legalSections': 'IPC 302, 34',
+    'complaintType': 'Cognizable Offence',
+    'complainant': 'Rajan Sharma',
+    'accused': 'Suresh Rao',
+    'victim': 'Rajan Sharma',
+    'witnesses': '3 witnesses recorded',
+    'ioName': 'Ramesh Patil',
+    'status': 'Under Investigation',
+  };
   Widget _buildTopTabs(BuildContext context, String currentTab) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -383,9 +423,9 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'FIR No. 2026/047',
-                        style: TextStyle(
+                      Text(
+                        'FIR No. ${_firDetails['firNumber'] ?? ''}',
+                        style: const TextStyle(
                           color: Color(0xFF0F1E36),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -395,9 +435,9 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Andheri Police Station',
-                            style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+                          Text(
+                            _firDetails['policeStation'] ?? '',
+                            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 13),
                           ),
                           Container(
                             decoration: BoxDecoration(
@@ -405,9 +445,9 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            child: const Text(
-                              'Under Investigation',
-                              style: TextStyle(
+                            child: Text(
+                              _firDetails['status'] ?? '',
+                              style: const TextStyle(
                                 color: Color(0xFFD97706),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -441,12 +481,12 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildMetaRow('FIR Number', '2026/047'),
-                    _buildMetaRow('Police Station', 'Andheri Police Station'),
-                    _buildMetaRow('Officer Incharge', 'Ramesh Patil'),
-                    _buildMetaRow('FIR Date', 'January 10, 2026'),
-                    _buildMetaRow('IPC Section', 'IPC 302, 34'),
-                    _buildMetaRow('Complaint Type', 'Cognizable Offence'),
+                    _buildMetaRow('FIR Number', _firDetails['firNumber'] ?? ''),
+                    _buildMetaRow('Police Station', _firDetails['policeStation'] ?? ''),
+                    _buildMetaRow('Officer Incharge', _firDetails['ioName'] ?? ''),
+                    _buildMetaRow('FIR Date', _firDetails['firDate'] ?? ''),
+                    _buildMetaRow('IPC Section', _firDetails['legalSections'] ?? ''),
+                    _buildMetaRow('Complaint Type', _firDetails['complaintType'] ?? ''),
                   ],
                 ),
               ),
@@ -465,9 +505,9 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildPartyRow('Complainant', 'Rajan Sharma', isLink: true),
-                    _buildPartyRow('Accused', 'Suresh Rao', isRed: true),
-                    _buildPartyRow('Witnesses', '3 witnesses recorded', isLink: true),
+                    _buildPartyRow('Complainant', _firDetails['complainant'] ?? '', isLink: true),
+                    _buildPartyRow('Accused', _firDetails['accused'] ?? '', isRed: true),
+                    _buildPartyRow('Witnesses', _firDetails['witnesses'] ?? '', isLink: true),
                     _buildPartyRow('Evidence', '12 items collected', isLink: true),
                   ],
                 ),
@@ -514,9 +554,9 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'FIR No. 2026/047',
-                        style: TextStyle(
+                      Text(
+                        'FIR No. ${_firDetails['firNumber'] ?? ''}',
+                        style: const TextStyle(
                           color: Color(0xFF0F1E36),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -525,14 +565,14 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
                       const SizedBox(height: 2),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
-                            'Andheri Police Station',
-                            style: TextStyle(color: Color(0xFF6B7280), fontSize: 12),
+                            _firDetails['policeStation'] ?? '',
+                            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 12),
                           ),
                           Text(
-                            'Under Investigation',
-                            style: TextStyle(
+                            _firDetails['status'] ?? '',
+                            style: const TextStyle(
                               color: Color(0xFFD97706),
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -558,12 +598,12 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _buildMetaRow('FIR Number', '2026/047'),
-          _buildMetaRow('Case Number', 'CR-2026/047/MH/084'),
-          _buildMetaRow('Police Station', 'Andheri West PS'),
-          _buildMetaRow('FIR Date', 'January 10, 2026'),
-          _buildMetaRow('Legal Sections', 'IPC 302, 120B, 34'),
-          _buildMetaRow('Complaint Type', 'Cognizable Offense'),
+          _buildMetaRow('FIR Number', _firDetails['firNumber'] ?? ''),
+          _buildMetaRow('Case Number', _firDetails['caseNumber'] ?? ''),
+          _buildMetaRow('Police Station', _firDetails['policeStation'] ?? ''),
+          _buildMetaRow('FIR Date', _firDetails['firDate'] ?? ''),
+          _buildMetaRow('Legal Sections', _firDetails['legalSections'] ?? ''),
+          _buildMetaRow('Complaint Type', _firDetails['complaintType'] ?? ''),
           const SizedBox(height: 24),
           const Divider(color: Color(0xFFE5E7EB), height: 1),
           const SizedBox(height: 24),
@@ -578,11 +618,11 @@ class _APMSFIRManagementScreenState extends State<APMSFIRManagementScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          _buildPartyRow('Complainant', 'Rajan Sharma', isLink: true),
-          _buildPartyRow('Accused', 'Unknown Party', isRed: true),
-          _buildPartyRow('Victim', 'Rajan Sharma', isLink: true),
-          _buildPartyRow('Witnesses', '3 witnesses recorded', isLink: true),
-          _buildPartyRow('IO Name', 'IO Rajesh Patil', isLink: true),
+          _buildPartyRow('Complainant', _firDetails['complainant'] ?? '', isLink: true),
+          _buildPartyRow('Accused', _firDetails['accused'] ?? '', isRed: true),
+          _buildPartyRow('Victim', _firDetails['victim'] ?? '', isLink: true),
+          _buildPartyRow('Witnesses', _firDetails['witnesses'] ?? '', isLink: true),
+          _buildPartyRow('IO Name', _firDetails['ioName'] ?? '', isLink: true),
           const SizedBox(height: 24),
           // Action Buttons
           Row(

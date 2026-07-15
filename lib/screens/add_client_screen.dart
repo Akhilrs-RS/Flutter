@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/clients_screen.dart';
 import 'package:advocate_app/screens/add_case_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSAddClientScreen extends StatefulWidget {
   const APMSAddClientScreen({super.key});
@@ -11,6 +12,77 @@ class APMSAddClientScreen extends StatefulWidget {
 }
 
 class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
+  final _nameController = TextEditingController();
+  final _idController = TextEditingController();
+  final _occupationController = TextEditingController();
+  final _mobileController = TextEditingController();
+  final _whatsappController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _stateController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _idController.dispose();
+    _occupationController.dispose();
+    _mobileController.dispose();
+    _whatsappController.dispose();
+    _emailController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    super.dispose();
+  }
+
+  void _saveClient({bool navigateToAddCase = false}) async {
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Client Name is required')),
+      );
+      return;
+    }
+
+    final newClient = {
+      'name': name,
+      'caseType': _occupationController.text.trim().isNotEmpty
+          ? _occupationController.text.trim()
+          : 'General Legal',
+      'tagText': 'NEW CLIENT',
+      'tagBgColor': '0xFFFEE2E2',
+      'tagTextColor': '0xFFDC2626',
+      'activeCases': '0 Active',
+      'rightLabel': 'Pending Fee',
+      'rightValue': '\$0.00',
+      'rightValueColor': '0xFF6B7280',
+      'imageUrl': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=80',
+      'isActive': true,
+      'isLead': false,
+      'isHighRisk': false,
+    };
+
+    final success = await ApiService.addClient(newClient);
+    if (success) {
+      if (mounted) {
+        if (navigateToAddCase) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const APMSAddCaseScreen()),
+          );
+        } else {
+          Navigator.of(context).pop(true);
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to save client to server')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveLayout(
@@ -170,7 +242,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const FormCard(
+                      FormCard(
                         title: 'Personal Information',
                         subtitle: 'Start by identifying the primary client profile.',
                         children: [
@@ -178,61 +250,70 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                             label: 'Full Legal Name',
                             hintText: 'e.g., Alexander Hamilton',
                             subtext: 'As per official identification documents.',
+                            controller: _nameController,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           CustomFormTextField(
                             label: 'Identification (Aadhaar/ID)',
                             hintText: 'XXXX-XXXX-XXXX',
+                            controller: _idController,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           CustomFormTextField(
                             label: 'Occupation',
                             hintText: 'e.g., Software Engineer',
+                            controller: _occupationController,
                           ),
                         ],
                       ),
-                      const FormCard(
+                      FormCard(
                         title: 'Contact Details',
                         children: [
                           CustomFormTextField(
                             label: 'Mobile Number',
                             hintText: '+91 XXXXX XXXXX',
                             subtext: 'As per official identification documents.',
+                            controller: _mobileController,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           CustomFormTextField(
                             label: 'WhatsApp Number',
                             hintText: '+91 XXXXX XXXXX',
+                            controller: _whatsappController,
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           CustomFormTextField(
                             label: 'Email Address',
                             hintText: 'email@example.com',
+                            controller: _emailController,
                           ),
                         ],
                       ),
                       FormCard(
                         title: 'ADDRESS',
                         children: [
-                          const CustomFormTextField(
+                          CustomFormTextField(
                             label: 'Address',
                             hintText: 'Street / Area',
                             prefixIcon: Icons.location_on_outlined,
+                            controller: _addressController,
                           ),
                           const SizedBox(height: 16),
                           Row(
-                            children: const [
+                            children: [
                               Expanded(
                                 child: CustomFormTextField(
                                   label: 'City',
                                   hintText: 'City',
+                                  controller: _cityController,
                                 ),
                               ),
-                              SizedBox(width: 16),
+                              const SizedBox(width: 16),
                               Expanded(
                                 child: CustomFormTextField(
                                   label: 'State',
                                   hintText: 'State',
+                                  controller: _stateController,
                                 ),
                               ),
                             ],
@@ -276,9 +357,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                             child: SizedBox(
                               height: 52,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
+                                onPressed: () => _saveClient(navigateToAddCase: false),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   foregroundColor: Colors.white,
@@ -298,11 +377,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                             child: SizedBox(
                               height: 52,
                               child: OutlinedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(builder: (context) => const APMSAddCaseScreen()),
-                                  );
-                                },
+                                onPressed: () => _saveClient(navigateToAddCase: true),
                                 style: OutlinedButton.styleFrom(
                                   side: const BorderSide(color: Color(0xFFD1D5DB), width: 1.2),
                                   shape: RoundedRectangleBorder(
@@ -440,7 +515,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        const FormCard(
+                        FormCard(
                           title: 'Personal Information',
                           subtitle: 'Start by identifying the primary client profile.',
                           children: [
@@ -448,16 +523,19 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                               label: 'Full Legal Name',
                               hintText: 'e.g., Alexander Hamilton',
                               subtext: 'As per official identification documents.',
+                              controller: _nameController,
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             CustomFormTextField(
                               label: 'Identification (Aadhaar/ID)',
                               hintText: 'XXXX-XXXX-XXXX',
+                              controller: _idController,
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             CustomFormTextField(
                               label: 'Occupation',
                               hintText: 'e.g., Software Engineer',
+                              controller: _occupationController,
                             ),
                           ],
                         ),
@@ -468,48 +546,54 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        const FormCard(
+                        FormCard(
                           title: 'Contact Details',
                           children: [
                             CustomFormTextField(
                               label: 'Mobile Number',
                               hintText: '+91 XXXXX XXXXX',
                               subtext: 'As per official identification documents.',
+                              controller: _mobileController,
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             CustomFormTextField(
                               label: 'WhatsApp Number',
                               hintText: '+91 XXXXX XXXXX',
+                              controller: _whatsappController,
                             ),
-                            SizedBox(height: 16),
+                            const SizedBox(height: 16),
                             CustomFormTextField(
                               label: 'Email Address',
                               hintText: 'email@example.com',
+                              controller: _emailController,
                             ),
                           ],
                         ),
                         FormCard(
                           title: 'ADDRESS',
                           children: [
-                            const CustomFormTextField(
+                            CustomFormTextField(
                               label: 'Address',
                               hintText: 'Street / Area',
                               prefixIcon: Icons.location_on_outlined,
+                              controller: _addressController,
                             ),
                             const SizedBox(height: 16),
                             Row(
-                              children: const [
+                              children: [
                                 Expanded(
                                   child: CustomFormTextField(
                                     label: 'City',
                                     hintText: 'City',
+                                    controller: _cityController,
                                   ),
                                 ),
-                                SizedBox(width: 16),
+                                const SizedBox(width: 16),
                                 Expanded(
                                   child: CustomFormTextField(
                                     label: 'State',
                                     hintText: 'State',
+                                    controller: _stateController,
                                   ),
                                 ),
                               ],
@@ -558,9 +642,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                     child: SizedBox(
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: () => _saveClient(navigateToAddCase: false),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           foregroundColor: Colors.white,
@@ -580,11 +662,7 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
                     child: SizedBox(
                       height: 52,
                       child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => const APMSAddCaseScreen()),
-                          );
-                        },
+                        onPressed: () => _saveClient(navigateToAddCase: true),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFFD1D5DB), width: 1.2),
                           shape: RoundedRectangleBorder(

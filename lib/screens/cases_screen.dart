@@ -5,6 +5,7 @@ import 'package:advocate_app/screens/add_case_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSCasesScreen extends StatefulWidget {
   const APMSCasesScreen({super.key});
@@ -18,7 +19,32 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
 
   final List<String> _filters = ['Active', 'Hearing Today', 'Pending', 'Appealed', 'Closed'];
 
-  final List<Map<String, dynamic>> _allCases = const [
+  List<Map<String, dynamic>> _allCases = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCases();
+  }
+
+  void _fetchCases() async {
+    final data = await ApiService.getCases();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allCases = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allCases = List<Map<String, dynamic>>.from(_mockCases);
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockCases = const [
     {
       'caseNo': 'CR-2024-8842-DL',
       'title': 'State vs. Harrison Miller',
@@ -440,7 +466,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => const APMSAddCaseScreen()),
-                          );
+                          ).then((_) => _fetchCases());
                         },
                         child: Container(
                           decoration: const BoxDecoration(

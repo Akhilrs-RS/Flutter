@@ -7,6 +7,7 @@ import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSEvidenceScreen extends StatefulWidget {
   const APMSEvidenceScreen({super.key});
@@ -16,6 +17,31 @@ class APMSEvidenceScreen extends StatefulWidget {
 }
 
 class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
+  List<Map<String, dynamic>> _recentEvidence = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEvidence();
+  }
+
+  void _fetchEvidence() async {
+    final data = await ApiService.getEvidence();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _recentEvidence = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _recentEvidence = List<Map<String, dynamic>>.from(_mockRecentEvidence);
+        });
+      }
+    }
+  }
+
   final List<Map<String, dynamic>> _categories = const [
     {'name': 'Documents', 'count': 12, 'icon': Icons.description_outlined, 'color': Color(0xFFEFF6FF), 'iconColor': Color(0xFF2563EB)},
     {'name': 'Images', 'count': 8, 'icon': Icons.image_outlined, 'color': Color(0xFFF5F3FF), 'iconColor': Color(0xFF7C3AED)},
@@ -27,7 +53,7 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
     {'name': 'Forensics Reports', 'count': 3, 'icon': Icons.science_outlined, 'color': Color(0xFFFDF2F8), 'iconColor': Color(0xFFDB2777)},
   ];
 
-  final List<Map<String, dynamic>> _recentEvidence = const [
+  final List<Map<String, dynamic>> _mockRecentEvidence = const [
     {
       'title': 'CCTV Footage',
       'subtitle': 'Shop premises 8PM - 10PM Jan 08',

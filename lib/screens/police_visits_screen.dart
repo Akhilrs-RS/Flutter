@@ -7,6 +7,7 @@ import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSPoliceVisitsScreen extends StatefulWidget {
   const APMSPoliceVisitsScreen({super.key});
@@ -16,6 +17,60 @@ class APMSPoliceVisitsScreen extends StatefulWidget {
 }
 
 class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
+  List<Map<String, dynamic>> _allVisits = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchVisits();
+  }
+
+  void _fetchVisits() async {
+    final data = await ApiService.getVisits();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allVisits = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allVisits = List<Map<String, dynamic>>.from(_mockVisits);
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockVisits = const [
+    {
+      'title': 'Andheri Police Station',
+      'subtitle': 'IO Rajesh Patil',
+      'tagText': 'Scheduled',
+      'tagBgColor': '0xFFE0F2FE',
+      'tagTextColor': '0xFF0369A1',
+      'caseInfo': 'CR-2026-047 . Jan 10, 2026',
+      'timeInfo': '02:00 PM . Witness statement',
+    },
+    {
+      'title': 'Bandra PS',
+      'subtitle': 'IO Meera Nair',
+      'tagText': 'Completed',
+      'tagBgColor': '0xFFD1FAE5',
+      'tagTextColor': '0xFF065F46',
+      'caseInfo': 'MV-2025-089 . Jul 05, 2025',
+      'timeInfo': '11:00 AM . FIR copy collection',
+    },
+    {
+      'title': 'Kurla PS',
+      'subtitle': 'IO Suresh Yadav',
+      'tagText': 'Pending',
+      'tagBgColor': '0xFFFEF3C7',
+      'tagTextColor': '0xFFD97706',
+      'caseInfo': 'CR-2025-099 . Jul 14, 2026',
+      'timeInfo': '10:00 AM . Evidence submission',
+    },
+  ];
   Widget _buildTopTabs(BuildContext context, String currentTab) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -191,33 +246,17 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                     children: [
                       _buildTopTabs(context, 'Visits'),
                       const SizedBox(height: 24),
-                      _buildVisitCard(
-                        title: 'Andheri Police Station',
-                        subtitle: 'IO Rajesh Patil',
-                        tagText: 'Scheduled',
-                        tagBgColor: const Color(0xFFE0F2FE),
-                        tagTextColor: const Color(0xFF0369A1),
-                        caseInfo: 'CR-2026-047 . Jan 10, 2026',
-                        timeInfo: '02:00 PM . Witness statement',
-                      ),
-                      _buildVisitCard(
-                        title: 'Bandra PS',
-                        subtitle: 'IO Meera Nair',
-                        tagText: 'Completed',
-                        tagBgColor: const Color(0xFFD1FAE5),
-                        tagTextColor: const Color(0xFF065F46),
-                        caseInfo: 'MV-2025-089 . Jul 05, 2025',
-                        timeInfo: '11:00 AM . FIR copy collection',
-                      ),
-                      _buildVisitCard(
-                        title: 'Kurla PS',
-                        subtitle: 'IO Suresh Yadav',
-                        tagText: 'Pending',
-                        tagBgColor: const Color(0xFFFEF3C7),
-                        tagTextColor: const Color(0xFFD97706),
-                        caseInfo: 'CR-2025-099 . Jul 14, 2026',
-                        timeInfo: '10:00 AM . Evidence submission',
-                      ),
+                      ..._allVisits.map((v) {
+                        return _buildVisitCard(
+                          title: v['title'] as String,
+                          subtitle: v['subtitle'] as String,
+                          tagText: v['tagText'] as String,
+                          tagBgColor: Color(int.parse(v['tagBgColor'] as String)),
+                          tagTextColor: Color(int.parse(v['tagTextColor'] as String)),
+                          caseInfo: v['caseInfo'] as String,
+                          timeInfo: v['timeInfo'] as String,
+                        );
+                      }),
                       const SizedBox(height: 8),
                       // Dotted Button
                       Container(
@@ -321,35 +360,17 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
   }
 
   Widget _buildDesktopLayout(BuildContext context) {
-    final visits = [
-      _buildVisitCard(
-        title: 'Andheri Police Station',
-        subtitle: 'IO Rajesh Patil',
-        tagText: 'Scheduled',
-        tagBgColor: const Color(0xFFE0F2FE),
-        tagTextColor: const Color(0xFF0369A1),
-        caseInfo: 'CR-2026-047 . Jan 10, 2026',
-        timeInfo: '02:00 PM . Witness statement',
-      ),
-      _buildVisitCard(
-        title: 'Bandra PS',
-        subtitle: 'IO Meera Nair',
-        tagText: 'Completed',
-        tagBgColor: const Color(0xFFD1FAE5),
-        tagTextColor: const Color(0xFF065F46),
-        caseInfo: 'MV-2025-089 . Jul 05, 2025',
-        timeInfo: '11:00 AM . FIR copy collection',
-      ),
-      _buildVisitCard(
-        title: 'Kurla PS',
-        subtitle: 'IO Suresh Yadav',
-        tagText: 'Pending',
-        tagBgColor: const Color(0xFFFEF3C7),
-        tagTextColor: const Color(0xFFD97706),
-        caseInfo: 'CR-2025-099 . Jul 14, 2026',
-        timeInfo: '10:00 AM . Evidence submission',
-      ),
-    ];
+    final visits = _allVisits.map((v) {
+      return _buildVisitCard(
+        title: v['title'] as String,
+        subtitle: v['subtitle'] as String,
+        tagText: v['tagText'] as String,
+        tagBgColor: Color(int.parse(v['tagBgColor'] as String)),
+        tagTextColor: Color(int.parse(v['tagTextColor'] as String)),
+        caseInfo: v['caseInfo'] as String,
+        timeInfo: v['timeInfo'] as String,
+      );
+    }).toList();
 
     List<Widget> leftCol = [];
     List<Widget> rightCol = [];

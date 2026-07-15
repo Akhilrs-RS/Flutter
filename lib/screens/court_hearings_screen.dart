@@ -4,6 +4,7 @@ import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSCourtHearingsScreen extends StatefulWidget {
   const APMSCourtHearingsScreen({super.key});
@@ -17,7 +18,32 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
 
   final List<String> _filters = ['Today (2)', 'Upcoming', 'Completed'];
 
-  final List<Map<String, dynamic>> _allHearings = const [
+  List<Map<String, dynamic>> _allHearings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchHearings();
+  }
+
+  void _fetchHearings() async {
+    final data = await ApiService.getHearings();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allHearings = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allHearings = List<Map<String, dynamic>>.from(_mockHearings);
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockHearings = const [
     {
       'caseNo': 'CR-2026-012',
       'client': 'Priya Mehta',

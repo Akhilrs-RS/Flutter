@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/add_client_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSClientsScreen extends StatefulWidget {
   const APMSClientsScreen({super.key});
@@ -14,7 +15,32 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
 
   final List<String> _filters = ['All Clients', 'Active', 'Leads', 'High Risk'];
 
-  final List<Map<String, dynamic>> _allClients = const [
+  List<Map<String, dynamic>> _allClients = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClients();
+  }
+
+  void _fetchClients() async {
+    final data = await ApiService.getClients();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allClients = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allClients = List<Map<String, dynamic>>.from(_mockClients);
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockClients = const [
     {
       'name': 'Robert Vance',
       'caseType': 'Corporate Litigation',
@@ -140,7 +166,7 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
                         onTap: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => const APMSAddClientScreen()),
-                          );
+                          ).then((_) => _fetchClients());
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -329,7 +355,7 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context) => const APMSAddClientScreen()),
-                          );
+                          ).then((_) => _fetchClients());
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,

@@ -3,6 +3,7 @@ import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSNotificationsScreen extends StatefulWidget {
   const APMSNotificationsScreen({super.key});
@@ -16,7 +17,64 @@ class _APMSNotificationsScreenState extends State<APMSNotificationsScreen> {
 
   final List<String> _filters = ['All', 'Hearings', 'Police', 'Payments', 'Due'];
 
-  final List<NotificationItem> _allNotifications = const [
+  List<NotificationItem> _allNotifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  void _fetchNotifications() async {
+    final data = await ApiService.getNotifications();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allNotifications = data.map((json) => _parseNotification(json)).toList();
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allNotifications = List<NotificationItem>.from(_mockNotifications);
+        });
+      }
+    }
+  }
+
+  NotificationItem _parseNotification(Map<String, dynamic> json) {
+    IconData iconData = Icons.notifications_none;
+    switch (json['icon'] as String?) {
+      case 'gavel':
+        iconData = Icons.gavel;
+        break;
+      case 'shield':
+        iconData = Icons.shield_outlined;
+        break;
+      case 'currency_rupee':
+        iconData = Icons.currency_rupee;
+        break;
+      case 'description':
+        iconData = Icons.description_outlined;
+        break;
+      case 'person':
+        iconData = Icons.person_outline;
+        break;
+    }
+
+    return NotificationItem(
+      title: json['title'] as String,
+      subtitle: json['subtitle'] as String,
+      time: json['time'] as String,
+      type: json['type'] as String,
+      isUnread: json['isUnread'] as bool,
+      icon: iconData,
+      iconBgColor: Color(int.parse(json['iconBgColor'] as String)),
+      iconColor: Color(int.parse(json['iconColor'] as String)),
+    );
+  }
+
+  final List<NotificationItem> _mockNotifications = const [
     NotificationItem(
       title: 'Hearing Reminder',
       subtitle: 'CR-2026-047 hearing tomorrow at 10:30 AM – Bombay HC Hall 7',

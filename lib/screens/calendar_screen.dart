@@ -3,6 +3,7 @@ import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSCalendarScreen extends StatefulWidget {
   const APMSCalendarScreen({super.key});
@@ -13,6 +14,59 @@ class APMSCalendarScreen extends StatefulWidget {
 
 class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
   String _currentView = 'Week';
+
+  List<Map<String, dynamic>> _todayEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTodayEvents();
+  }
+
+  void _fetchTodayEvents() async {
+    final hearings = await ApiService.getHearings();
+    if (hearings.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _todayEvents = hearings.map((h) {
+            return {
+              'time': h['time'] as String,
+              'title': h['title'] as String,
+              'subtitle': h['court'] as String,
+              'accentColor': h['accentColor'] as String,
+            };
+          }).toList();
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _todayEvents = List<Map<String, dynamic>>.from(_mockTodayEvents);
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockTodayEvents = const [
+    {
+      'time': '10:30',
+      'title': 'Sharma vs State',
+      'subtitle': 'Bombay HC – Hall 7',
+      'accentColor': '0xFF2563EB',
+    },
+    {
+      'time': '14:00',
+      'title': 'Police Visit – Andheri PS',
+      'subtitle': 'IO Rajesh Patil',
+      'accentColor': '0xFFD97706',
+    },
+    {
+      'time': '16:30',
+      'title': 'Client Meeting – Mehta',
+      'subtitle': 'Office consultation',
+      'accentColor': '0xFF10B981',
+    },
+  ];
 
   final List<Map<String, dynamic>> _monthDays = const [
     {'day': null, 'dots': <Color>[]},
@@ -1268,29 +1322,18 @@ class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
             border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
           ),
           child: Column(
-            children: [
-              _buildMonthEventRow(
-                time: '10:30',
-                title: 'Sharma vs State',
-                subtitle: 'Bombay HC – Hall 7',
-                accentColor: Colors.blue,
-                showDivider: true,
-              ),
-              _buildMonthEventRow(
-                time: '14:00',
-                title: 'Police Visit – Andheri PS',
-                subtitle: 'IO Rajesh Patil',
-                accentColor: Colors.orange,
-                showDivider: true,
-              ),
-              _buildMonthEventRow(
-                time: '16:30',
-                title: 'Client Meeting – Mehta',
-                subtitle: 'Office consultation',
-                accentColor: Colors.green,
-                showDivider: false,
-              ),
-            ],
+            children: List.generate(_todayEvents.length, (index) {
+              final ev = _todayEvents[index];
+              final hexColorStr = ev['accentColor'] as String;
+              final accentColor = Color(int.tryParse(hexColorStr) ?? 0xFF2563EB);
+              return _buildMonthEventRow(
+                time: ev['time'] as String,
+                title: ev['title'] as String,
+                subtitle: ev['subtitle'] as String,
+                accentColor: accentColor,
+                showDivider: index < _todayEvents.length - 1,
+              );
+            }),
           ),
         ),
       ],

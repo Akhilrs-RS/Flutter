@@ -4,6 +4,7 @@ import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSRemindersScreen extends StatefulWidget {
   const APMSRemindersScreen({super.key});
@@ -13,7 +14,51 @@ class APMSRemindersScreen extends StatefulWidget {
 }
 
 class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
-  final List<Map<String, dynamic>> _reminders = const [
+  List<Map<String, dynamic>> _allReminders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReminders();
+  }
+
+  void _fetchReminders() async {
+    final data = await ApiService.getReminders();
+    if (data.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          _allReminders = data;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _allReminders = List<Map<String, dynamic>>.from(_mockReminders);
+        });
+      }
+    }
+  }
+
+  void _toggleReminder(String title, bool isCompleted) async {
+    final success = await ApiService.toggleReminderCompletion(title, isCompleted);
+    if (success) {
+      _fetchReminders();
+    } else {
+      if (mounted) {
+        setState(() {
+          for (var r in _allReminders) {
+            if (r['title'] == title) {
+              r['isCompleted'] = isCompleted;
+              r['subtitle'] = isCompleted ? 'Completed' : 'Pending';
+              break;
+            }
+          }
+        });
+      }
+    }
+  }
+
+  final List<Map<String, dynamic>> _mockReminders = const [
     {
       'title': 'File Bail Application',
       'priority': 'High',
@@ -185,9 +230,9 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
                 ),
                 child: ListView.builder(
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                  itemCount: _reminders.length,
+                  itemCount: _allReminders.length,
                   itemBuilder: (context, index) {
-                    return _buildReminderCard(_reminders[index]);
+                    return _buildReminderCard(_allReminders[index]);
                   },
                 ),
               ),
@@ -279,11 +324,11 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
   Widget _buildDesktopRemindersGrid() {
     List<Widget> leftCol = [];
     List<Widget> rightCol = [];
-    for (int i = 0; i < _reminders.length; i++) {
+    for (int i = 0; i < _allReminders.length; i++) {
       if (i % 2 == 0) {
-        leftCol.add(_buildDesktopReminderCard(_reminders[i]));
+        leftCol.add(_buildDesktopReminderCard(_allReminders[i]));
       } else {
-        rightCol.add(_buildDesktopReminderCard(_reminders[i]));
+        rightCol.add(_buildDesktopReminderCard(_allReminders[i]));
       }
     }
 
@@ -415,8 +460,8 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () {},
+                         ElevatedButton.icon(
+                          onPressed: () => _toggleReminder(title, true),
                           icon: const Icon(Icons.check, size: 14),
                           label: const Text('Complete'),
                           style: ElevatedButton.styleFrom(
@@ -616,7 +661,7 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
               children: [
                 Row(
                   children: [
-                    _buildIconButton(Icons.check, Colors.green, () {}),
+                    _buildIconButton(Icons.check, Colors.green, () => _toggleReminder(title, true)),
                     const SizedBox(width: 6),
                     _buildIconButton(Icons.snooze, Colors.orange, () {}),
                   ],

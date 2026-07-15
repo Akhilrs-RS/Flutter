@@ -835,6 +835,7 @@ class CustomFormTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final int maxLines;
+  final TextEditingController? controller;
 
   const CustomFormTextField({
     super.key,
@@ -844,6 +845,7 @@ class CustomFormTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.maxLines = 1,
+    this.controller,
   });
 
   @override
@@ -875,6 +877,7 @@ class CustomFormTextField extends StatelessWidget {
               ],
               Expanded(
                 child: TextField(
+                  controller: controller,
                   maxLines: maxLines,
                   style: const TextStyle(
                     color: Color(0xFF111827),
