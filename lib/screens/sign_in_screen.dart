@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/verification_screen.dart';
 import 'package:advocate_app/screens/create_account_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSSignInScreen extends StatelessWidget {
   const APMSSignInScreen({super.key});
@@ -76,6 +77,55 @@ class SignInForm extends StatefulWidget {
 
 class _SignInFormState extends State<SignInForm> {
   bool _rememberMe = false;
+  bool _isLoading = false;
+
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter email and password.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final res = await ApiService.login(email, password);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res['success'] == true) {
+      if (mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const APMSVerificationScreen(),
+          ),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res['message'] ?? 'Login failed.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,17 +157,19 @@ class _SignInFormState extends State<SignInForm> {
             ),
           ),
           const SizedBox(height: 32),
-          const CustomTextField(
+          CustomTextField(
             label: 'Email or Mobile Number',
             hintText: 'attorney@firm.com',
             suffixIcon: Icons.mail_outline,
+            controller: _emailController,
           ),
           const SizedBox(height: 20),
-          const CustomTextField(
+          CustomTextField(
             label: 'Password',
             hintText: '••••••••',
             suffixIcon: Icons.visibility_outlined,
             obscureText: true,
+            controller: _passwordController,
           ),
           const SizedBox(height: 16),
           Row(
@@ -186,13 +238,7 @@ class _SignInFormState extends State<SignInForm> {
               ],
             ),
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const APMSVerificationScreen(),
-                  ),
-                );
-              },
+              onPressed: _isLoading ? null : _handleLogin,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
@@ -201,23 +247,29 @@ class _SignInFormState extends State<SignInForm> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 18,
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 18,
-                  ),
-                ],
-              ),
             ),
           ),
           const SizedBox(height: 48),

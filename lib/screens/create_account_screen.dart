@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/sign_in_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSCreateAccountScreen extends StatelessWidget {
   const APMSCreateAccountScreen({super.key});
@@ -75,6 +76,62 @@ class CreateAccountForm extends StatefulWidget {
 
 class _CreateAccountFormState extends State<CreateAccountForm> {
   bool _rememberMe = false;
+  bool _isLoading = false;
+
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _handleRegister() async {
+    final name = _nameController.text.trim();
+    final phone = _phoneController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final res = await ApiService.register(name, email, phone, password);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res['success'] == true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully! Please sign in.')),
+        );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const APMSSignInScreen()),
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res['message'] ?? 'Registration failed.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,29 +163,33 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
             ),
           ),
           const SizedBox(height: 32),
-          const CustomTextField(
+          CustomTextField(
             label: 'Full Name',
             hintText: 'user name',
             suffixIcon: Icons.person_outline,
+            controller: _nameController,
           ),
           const SizedBox(height: 20),
-          const CustomTextField(
+          CustomTextField(
             label: 'Mobile Number',
             hintText: 'enter your phone number',
             suffixIcon: Icons.phone_outlined,
+            controller: _phoneController,
           ),
           const SizedBox(height: 20),
-          const CustomTextField(
+          CustomTextField(
             label: 'Email',
             hintText: 'enter your email',
             suffixIcon: Icons.mail_outline,
+            controller: _emailController,
           ),
           const SizedBox(height: 20),
-          const CustomTextField(
+          CustomTextField(
             label: 'Password',
             hintText: '••••••••',
             suffixIcon: Icons.visibility_outlined,
             obscureText: true,
+            controller: _passwordController,
           ),
           const SizedBox(height: 16),
           Row(
@@ -196,7 +257,7 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
               ],
             ),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: _isLoading ? null : _handleRegister,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
@@ -205,23 +266,29 @@ class _CreateAccountFormState extends State<CreateAccountForm> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Text(
+                          'Create Account',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 18,
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 18,
-                  ),
-                ],
-              ),
             ),
           ),
           const SizedBox(height: 32),

@@ -231,6 +231,7 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final IconData suffixIcon;
   final bool obscureText;
+  final TextEditingController? controller;
 
   const CustomTextField({
     super.key,
@@ -238,6 +239,7 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     required this.suffixIcon,
     this.obscureText = false,
+    this.controller,
   });
 
   @override
@@ -268,6 +270,7 @@ class CustomTextField extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  controller: controller,
                   obscureText: obscureText,
                   style: const TextStyle(
                     color: Color(0xFF111827),

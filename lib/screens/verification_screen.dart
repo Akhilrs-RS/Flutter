@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:advocate_app/widgets/shared_widgets.dart';
 import 'package:advocate_app/screens/home_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
 class APMSVerificationScreen extends StatefulWidget {
   const APMSVerificationScreen({super.key});
@@ -175,6 +176,7 @@ class _OTPVerificationFormState extends State<OTPVerificationForm> {
   final _otp2 = TextEditingController();
   final _otp3 = TextEditingController();
   final _otp4 = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -183,6 +185,44 @@ class _OTPVerificationFormState extends State<OTPVerificationForm> {
     _otp3.dispose();
     _otp4.dispose();
     super.dispose();
+  }
+
+  void _handleVerifyOTP() async {
+    final code = '${_otp1.text.trim()}${_otp2.text.trim()}${_otp3.text.trim()}${_otp4.text.trim()}';
+    
+    if (code.length < 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter all 4 digits.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final res = await ApiService.verifyOTP(code);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (res['success'] == true) {
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const APMSHomeScreen(),
+          ),
+          (route) => false,
+        );
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res['message'] ?? 'Invalid code.')),
+        );
+      }
+    }
   }
 
   @override
@@ -214,14 +254,7 @@ class _OTPVerificationFormState extends State<OTPVerificationForm> {
             ],
           ),
           child: ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => const APMSHomeScreen(),
-                ),
-                (route) => false,
-              );
-            },
+            onPressed: _isLoading ? null : _handleVerifyOTP,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
@@ -230,23 +263,29 @@ class _OTPVerificationFormState extends State<OTPVerificationForm> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  'Verify & Continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text(
+                        'Verify & Continue',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward,
+                        size: 18,
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward,
-                  size: 18,
-                ),
-              ],
-            ),
           ),
         ),
       ],

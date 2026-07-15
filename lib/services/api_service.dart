@@ -185,4 +185,57 @@ class ApiService {
     }
     return [];
   }
+
+  // 9. User Authentication
+  static Future<Map<String, dynamic>> login(String emailOrPhone, String password) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'emailOrPhone': emailOrPhone,
+          'password': password,
+        }),
+      );
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    } catch (e) {
+      print('Network error login: $e');
+    }
+    return {'success': false, 'message': 'Connection error.'};
+  }
+
+  static Future<Map<String, dynamic>> register(String name, String email, String phone, String password) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'password': password,
+        }),
+      );
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    } catch (e) {
+      print('Network error register: $e');
+    }
+    return {'success': false, 'message': 'Connection error.'};
+  }
+
+  static Future<Map<String, dynamic>> verifyOTP(String code) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/auth/verify'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'code': code,
+        }),
+      );
+      return jsonDecode(res.body) as Map<String, dynamic>;
+    } catch (e) {
+      print('Network error verify OTP: $e');
+    }
+    return {'success': false, 'message': 'Connection error.'};
+  }
 }

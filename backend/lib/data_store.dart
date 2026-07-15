@@ -18,6 +18,7 @@ class DataStore {
   Map<String, dynamic> firDetails = {};
   List<Map<String, dynamic>> evidence = [];
   List<Map<String, dynamic>> monthEvents = [];
+  List<Map<String, dynamic>> users = [];
 
   Future<void> init() async {
     if (await _file.exists()) {
@@ -34,6 +35,7 @@ class DataStore {
         firDetails = Map<String, dynamic>.from(data['firDetails'] ?? {});
         evidence = List<Map<String, dynamic>>.from(data['evidence'] ?? []);
         monthEvents = List<Map<String, dynamic>>.from(data['monthEvents'] ?? []);
+        users = List<Map<String, dynamic>>.from(data['users'] ?? []);
         return;
       } catch (e) {
         print('Error reading data.json, falling back to mock data: $e');
@@ -56,6 +58,7 @@ class DataStore {
       'firDetails': firDetails,
       'evidence': evidence,
       'monthEvents': monthEvents,
+      'users': users,
     };
     await _file.writeAsString(jsonEncode(data));
   }
@@ -488,6 +491,15 @@ class DataStore {
         'subtitle': 'Office consultation',
         'accentColor': '0xFF10B981',
       },
+    ];
+
+    users = [
+      {
+        'email': 'attorney@firm.com',
+        'name': 'Adv. Arjun Mehtha',
+        'phone': '9876543210',
+        'password': 'password123',
+      }
     ];
   }
 }
