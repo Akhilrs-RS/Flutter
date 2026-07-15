@@ -22,7 +22,7 @@ void main(List<String> args) async {
       .addHandler(apiRouter.router.call);
 
   // Bind server to port 8080
-  final port = int.tryParse(Platform.environment['PORT'] ?? '5000') ?? 5000;
+  final port = int.tryParse(Platform.environment['PORT'] ?? '5001') ?? 5001;
   final server = await io.serve(handler, '0.0.0.0', port);
   print('Server listening on http://${server.address.host}:${server.port}');
 }
