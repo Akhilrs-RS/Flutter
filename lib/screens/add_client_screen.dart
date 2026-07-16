@@ -50,6 +50,14 @@ class _APMSAddClientScreenState extends State<APMSAddClientScreen> {
       'caseType': _occupationController.text.trim().isNotEmpty
           ? _occupationController.text.trim()
           : 'General Legal',
+      'idNumber': _idController.text.trim(),
+      'occupation': _occupationController.text.trim(),
+      'mobile': _mobileController.text.trim(),
+      'whatsapp': _whatsappController.text.trim(),
+      'email': _emailController.text.trim(),
+      'address': _addressController.text.trim(),
+      'city': _cityController.text.trim(),
+      'state': _stateController.text.trim(),
       'tagText': 'NEW CLIENT',
       'tagBgColor': '0xFFFEE2E2',
       'tagTextColor': '0xFFDC2626',
