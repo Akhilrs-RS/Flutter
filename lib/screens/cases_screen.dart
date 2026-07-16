@@ -404,7 +404,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                           InkWell(
                             onTap: () {
                               Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => const APMSCaseDetailsScreen()),
+                                MaterialPageRoute(builder: (context) => APMSCaseDetailsScreen(caseData: c)),
                               );
                             },
                             child: Row(

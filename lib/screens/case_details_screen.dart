@@ -4,12 +4,116 @@ import 'package:advocate_app/screens/notifications_screen.dart';
 import 'package:advocate_app/screens/profile_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/evidence_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
-class APMSCaseDetailsScreen extends StatelessWidget {
-  const APMSCaseDetailsScreen({super.key});
+class APMSCaseDetailsScreen extends StatefulWidget {
+  final Map<String, dynamic>? caseData;
+  const APMSCaseDetailsScreen({super.key, this.caseData});
+
+  @override
+  State<APMSCaseDetailsScreen> createState() => _APMSCaseDetailsScreenState();
+}
+
+class _APMSCaseDetailsScreenState extends State<APMSCaseDetailsScreen> {
+  Map<String, dynamic>? _currentCase;
+  Map<String, dynamic>? _matchingHearing;
+  bool _isLoading = true;
+
+  Color _parseColor(dynamic val, Color defaultColor) {
+    if (val is Color) return val;
+    if (val is String) {
+      final cleaned = val.replaceAll('#', '').replaceAll('0x', '');
+      final parsed = int.tryParse(cleaned, radix: 16);
+      if (parsed != null) {
+        if (cleaned.length == 6) {
+          return Color(parsed + 0xFF000000);
+        }
+        return Color(parsed);
+      }
+    }
+    return defaultColor;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCase = widget.caseData;
+    _fetchDetails();
+  }
+
+  void _fetchDetails() async {
+    List<Map<String, dynamic>> cases = [];
+    if (_currentCase == null) {
+      cases = await ApiService.getCases();
+      if (cases.isNotEmpty && mounted) {
+        setState(() {
+          _currentCase = cases.first;
+        });
+      }
+    }
+
+    final hearings = await ApiService.getHearings();
+    if (_currentCase != null) {
+      final caseNo = _currentCase!['caseNo']?.toString().toLowerCase().trim() ?? '';
+      for (var h in hearings) {
+        final hCaseNo = h['caseNo']?.toString().toLowerCase().trim() ?? '';
+        if (hCaseNo == caseNo || caseNo.contains(hCaseNo) || hCaseNo.contains(caseNo)) {
+          _matchingHearing = h;
+          break;
+        }
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  String get _hearingDate {
+    final nextDate = _currentCase?['nextDate']?.toString() ?? '';
+    if (nextDate.contains('Next: ')) {
+      final parts = nextDate.replaceAll('Next: ', '').split(', ');
+      if (parts.isNotEmpty) return parts.first;
+    }
+    return 'Oct 24';
+  }
+
+  String get _hearingTime {
+    if (_matchingHearing != null) {
+      final time = _matchingHearing!['time'] ?? '10:30';
+      final period = _matchingHearing!['period'] ?? 'AM';
+      return 'Thursday • $time $period';
+    }
+    return 'Thursday • 10:30 AM';
+  }
+
+  String get _hearingCourt {
+    return _matchingHearing?['court']?.toString() ?? _currentCase?['court']?.toString() ?? 'Courtroom 4B';
+  }
+
+  String get _hearingJudge {
+    return _matchingHearing?['judge']?.toString() ?? 'Judge Elena Vance';
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Colors.black),
+        ),
+      );
+    }
+
+    if (_currentCase == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Case Details')),
+        body: const Center(child: Text('No case details available.')),
+      );
+    }
+
     return ResponsiveLayout(
       mobileLayout: _buildMobileLayout(context),
       desktopLayout: _buildDesktopLayout(context),
@@ -17,6 +121,16 @@ class APMSCaseDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
+    final title = _currentCase!['title']?.toString() ?? '';
+    final status = _currentCase!['status']?.toString() ?? 'Active';
+    final caseNo = _currentCase!['caseNo']?.toString() ?? '';
+    final statusBg = _currentCase!['statusBgColor'] != null 
+        ? _parseColor(_currentCase!['statusBgColor'], const Color(0xFFD1FAE5)) 
+        : const Color(0xFFD1FAE5);
+    final statusTextCol = _currentCase!['statusTextColor'] != null 
+        ? _parseColor(_currentCase!['statusTextColor'], const Color(0xFF065F46)) 
+        : const Color(0xFF065F46);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -98,10 +212,10 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'State vs. Harrison\nMiller',
-                              style: TextStyle(
+                              title,
+                              style: const TextStyle(
                                 color: Color(0xFF0F1E36),
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -112,14 +226,14 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFD1FAE5),
+                              color: statusBg,
                               borderRadius: BorderRadius.circular(20),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            child: const Text(
-                              'Active',
+                            child: Text(
+                              status,
                               style: TextStyle(
-                                color: Color(0xFF065F46),
+                                color: statusTextCol,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -128,9 +242,9 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Case ID: CR-2024-8842-DL',
-                        style: TextStyle(
+                      Text(
+                        'Case ID: $caseNo',
+                        style: const TextStyle(
                           color: Color(0xFF6B7280),
                           fontSize: 14,
                         ),
@@ -164,10 +278,10 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const PeopleCard(
+                      PeopleCard(
                         role: 'Honorable Judge',
-                        name: 'Elena Vance',
-                        avatar: CircleAvatar(
+                        name: _hearingJudge.replaceAll('Judge ', '').replaceAll('Hon. Justice ', ''),
+                        avatar: const CircleAvatar(
                           radius: 18,
                           backgroundColor: Color(0xFFEFF6FF),
                           child: Icon(Icons.gavel, color: Colors.blue, size: 18),
@@ -256,6 +370,16 @@ class APMSCaseDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDesktopLayout(BuildContext context) {
+    final title = _currentCase!['title']?.toString() ?? '';
+    final status = _currentCase!['status']?.toString() ?? 'Active';
+    final caseNo = _currentCase!['caseNo']?.toString() ?? '';
+    final statusBg = _currentCase!['statusBgColor'] != null 
+        ? _parseColor(_currentCase!['statusBgColor'], const Color(0xFFD1FAE5)) 
+        : const Color(0xFFD1FAE5);
+    final statusTextCol = _currentCase!['statusTextColor'] != null 
+        ? _parseColor(_currentCase!['statusTextColor'], const Color(0xFF065F46)) 
+        : const Color(0xFF065F46);
+
     return DesktopLayoutWrapper(
       activeMenu: 'Cases',
       child: Theme(
@@ -273,20 +397,20 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        'State vs. Harrison Miller',
-                        style: TextStyle(
+                        title,
+                        style: const TextStyle(
                           color: Color(0xFF0F1E36),
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Georgia',
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Case ID: CR-2024-8842-DL',
-                        style: TextStyle(
+                        'Case ID: $caseNo',
+                        style: const TextStyle(
                           color: Color(0xFF6B7280),
                           fontSize: 14,
                         ),
@@ -295,14 +419,14 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD1FAE5),
+                      color: statusBg,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: const Text(
-                      'Active',
+                    child: Text(
+                      status,
                       style: TextStyle(
-                        color: Color(0xFF065F46),
+                        color: statusTextCol,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -344,8 +468,8 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                           padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
-                              Text(
+                            children: [
+                              const Text(
                                 'People Involved',
                                 style: TextStyle(
                                   color: Color(0xFF0F1E36),
@@ -353,8 +477,8 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 16),
-                              PeopleCard(
+                              const SizedBox(height: 16),
+                              const PeopleCard(
                                 role: 'Advocate',
                                 name: 'John Doe',
                                 avatar: CircleAvatar(
@@ -366,14 +490,14 @@ class APMSCaseDetailsScreen extends StatelessWidget {
                               ),
                               PeopleCard(
                                 role: 'Honorable Judge',
-                                name: 'Elena Vance',
-                                avatar: CircleAvatar(
+                                name: _hearingJudge,
+                                avatar: const CircleAvatar(
                                   radius: 18,
                                   backgroundColor: Color(0xFFEFF6FF),
                                   child: Icon(Icons.gavel, color: Colors.blue, size: 18),
                                 ),
                               ),
-                              PeopleCard(
+                              const PeopleCard(
                                 role: 'Opposing Counsel',
                                 name: 'Foster & Sterling LLP',
                                 avatar: CircleAvatar(
@@ -525,19 +649,19 @@ class APMSCaseDetailsScreen extends StatelessWidget {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    'Oct 24',
-                    style: TextStyle(
+                    _hearingDate,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Thursday • 10:30 AM',
-                    style: TextStyle(
+                    _hearingTime,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -547,19 +671,19 @@ class APMSCaseDetailsScreen extends StatelessWidget {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: const [
+                children: [
                   Text(
-                    'Courtroom 4B',
-                    style: TextStyle(
+                    _hearingCourt,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Judge Elena Vance',
-                    style: TextStyle(
+                    _hearingJudge,
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
                     ),
@@ -601,6 +725,9 @@ class APMSCaseDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildCaseSummaryCard() {
+    final summaryText = _currentCase!['summary']?.toString() ?? 
+        'Civil litigation regarding contractual dispute in commercial real estate development. Current stage involves secondary evidence submission for phase 1 planning permissions. Adjourned from previous session due to witness unavailability.';
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -610,8 +737,8 @@ class APMSCaseDetailsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
+        children: [
+          const Text(
             'Case Summary',
             style: TextStyle(
               color: Color(0xFF0F1E36),
@@ -619,10 +746,10 @@ class APMSCaseDetailsScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            'Civil litigation regarding contractual dispute in commercial real estate development. Current stage involves secondary evidence submission for phase 1 planning permissions. Adjourned from previous session due to witness unavailability.',
-            style: TextStyle(
+            summaryText,
+            style: const TextStyle(
               color: Color(0xFF6B7280),
               fontSize: 14,
               height: 1.5,
