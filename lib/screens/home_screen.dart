@@ -1055,13 +1055,13 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                                     },
                                   ),
                                   QuickActionButton(
-                                    icon: Icons.description_outlined,
+                                    icon: Icons.gavel_outlined,
                                     color: const Color(0xFFE0F2FE),
                                     iconColor: Colors.lightBlue,
-                                    label: 'Documents',
+                                    label: 'Scheduled Hearings',
                                     onTap: () {
                                       Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) => const APMSEvidenceScreen()),
+                                        MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
                                       );
                                     },
                                   ),

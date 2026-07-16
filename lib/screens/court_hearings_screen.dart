@@ -134,29 +134,11 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
                         onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.add, color: Colors.black, size: 14),
-                            SizedBox(width: 4),
-                            Text(
-                              'Add',
-                              style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -167,7 +149,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: const [
                         Text(
-                          'Count Hearings',
+                          'Schedule Hearings',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24,
@@ -176,7 +158,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '8 hearings this week',
+                          '6 hearings this week',
                           style: TextStyle(
                             color: Colors.white54,
                             fontSize: 12,
