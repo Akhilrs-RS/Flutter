@@ -57,6 +57,108 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
     }
   }
 
+  void _showScheduleVisitDialog(BuildContext context) {
+    final psController = TextEditingController();
+    final ioController = TextEditingController();
+    final caseController = TextEditingController();
+    final dateController = TextEditingController();
+    final timeController = TextEditingController();
+    final purposeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Schedule Police Visit', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: psController,
+                  decoration: const InputDecoration(labelText: 'Police Station Name', hintText: 'e.g. Andheri Police Station'),
+                ),
+                TextField(
+                  controller: ioController,
+                  decoration: const InputDecoration(labelText: 'Investigating Officer (IO)', hintText: 'e.g. IO Rajesh Patil'),
+                ),
+                TextField(
+                  controller: caseController,
+                  decoration: const InputDecoration(labelText: 'Case Info / No.', hintText: 'e.g. CR-2026-047'),
+                ),
+                TextField(
+                  controller: dateController,
+                  decoration: const InputDecoration(labelText: 'Date', hintText: 'e.g. Jan 10, 2026'),
+                ),
+                TextField(
+                  controller: timeController,
+                  decoration: const InputDecoration(labelText: 'Time', hintText: 'e.g. 02:00 PM'),
+                ),
+                TextField(
+                  controller: purposeController,
+                  decoration: const InputDecoration(labelText: 'Purpose', hintText: 'e.g. Witness statement'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final ps = psController.text.trim();
+                final io = ioController.text.trim();
+                final caseInfo = caseController.text.trim();
+                final date = dateController.text.trim();
+                final time = timeController.text.trim();
+                final purpose = purposeController.text.trim();
+
+                if (ps.isEmpty || io.isEmpty || caseInfo.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please fill in Police Station, IO, and Case info.')),
+                  );
+                  return;
+                }
+
+                final visitData = {
+                  'title': ps,
+                  'subtitle': io,
+                  'tagText': 'Scheduled',
+                  'tagBgColor': '0xFFE0F2FE',
+                  'tagTextColor': '0xFF0369A1',
+                  'caseInfo': '$caseInfo . $date',
+                  'timeInfo': '$time . $purpose',
+                };
+
+                final success = await ApiService.addVisit(visitData);
+                if (success) {
+                  _fetchVisits();
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Police visit scheduled successfully.')),
+                    );
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to save visit to server.')),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black, foregroundColor: Colors.white),
+              child: const Text('Schedule'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final List<Map<String, dynamic>> _mockVisits = const [
     {
       'title': 'Andheri Police Station',
@@ -286,7 +388,7 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: InkWell(
-                          onTap: () {},
+                          onTap: () => _showScheduleVisitDialog(context),
                           borderRadius: BorderRadius.circular(12),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -449,7 +551,7 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () => _showScheduleVisitDialog(context),
                   borderRadius: BorderRadius.circular(12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
