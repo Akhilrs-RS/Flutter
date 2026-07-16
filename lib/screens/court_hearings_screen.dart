@@ -434,19 +434,29 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
     Color tagBgColor;
     Color tagTextColor;
     if (tag == 'Today' || tag == 'Completed') {
-      tagBgColor = const Color(0xFFD1FAE5);
-      tagTextColor = const Color(0xFF065F46);
+      tagBgColor = const Color(0xFFDCFCE7);
+      tagTextColor = const Color(0xFF15803D);
     } else {
-      tagBgColor = const Color(0xFFE0F2FE);
-      tagTextColor = const Color(0xFF0369A1);
+      tagBgColor = const Color(0xFFDBEAFE);
+      tagTextColor = const Color(0xFF1D4ED8);
     }
 
+    final isToday = tag == 'Today';
+    final timeIcon = isToday ? Icons.access_time_outlined : Icons.calendar_month_outlined;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x05000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -454,21 +464,19 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Text(
-                          '$caseNo  .  $client',
-                          style: const TextStyle(
-                            color: Color(0xFF0F1E36),
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      Text(
+                        caseNo,
+                        style: const TextStyle(
+                          color: Color(0xFF3B82F6),
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       Container(
@@ -488,10 +496,19 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
+                  Text(
+                    client,
+                    style: const TextStyle(
+                      color: Color(0xFF0F1E36),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.gavel_outlined, color: Colors.grey, size: 14),
+                      const Icon(Icons.location_on_outlined, color: Color(0xFF9CA3AF), size: 14),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -504,7 +521,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.access_time_outlined, color: Colors.grey, size: 14),
+                      Icon(timeIcon, color: const Color(0xFF9CA3AF), size: 14),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
@@ -515,9 +532,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                     ],
                   ),
                   if (!isCompleted) ...[
-                    const SizedBox(height: 16),
-                    const Divider(color: Color(0xFFE5E7EB), height: 1),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                     Row(
                       children: [
                         Expanded(
@@ -530,7 +545,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text(
                               'Update Outcome',
@@ -543,19 +558,20 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: OutlinedButton(
+                          child: ElevatedButton(
                             onPressed: () {},
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFE5E7EB)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF3F4F6),
+                              foregroundColor: const Color(0xFF374151),
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text(
                               'Add Order',
                               style: TextStyle(
-                                color: Color(0xFF374151),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -564,19 +580,20 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: OutlinedButton(
+                          child: ElevatedButton(
                             onPressed: () {},
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Color(0xFFE5E7EB)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF3F4F6),
+                              foregroundColor: const Color(0xFF374151),
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: const Text(
                               'Navigate',
                               style: TextStyle(
-                                color: Color(0xFF374151),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -592,7 +609,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
             if (isCompleted && note != null)
               Container(
                 width: double.infinity,
-                color: const Color(0xFFDCFCE7),
+                color: const Color(0xFFECFDF5),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
@@ -601,7 +618,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                     Text(
                       note,
                       style: const TextStyle(
-                        color: Color(0xFF15803D),
+                        color: Color(0xFF059669),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),

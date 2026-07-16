@@ -314,21 +314,21 @@ class CaseFilterTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(right: 10),
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        color: selected ? Colors.black : Colors.transparent,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: selected ? Colors.black : const Color(0xFFD1D5DB),
+          color: selected ? const Color(0xFF0F1E36) : const Color(0xFFE5E7EB),
           width: 1.2,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Text(
         label,
         style: TextStyle(
-          color: selected ? Colors.white : const Color(0xFF6B7280),
-          fontSize: 13,
+          color: selected ? const Color(0xFF0F1E36) : const Color(0xFF9CA3AF),
+          fontSize: 12,
           fontWeight: selected ? FontWeight.bold : FontWeight.w500,
         ),
       ),
