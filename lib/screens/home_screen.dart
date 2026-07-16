@@ -1082,20 +1082,6 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   QuickActionButton(
-                                    icon: Icons.event_note_outlined,
-                                    color: const Color(0xFFFEE2E2),
-                                    iconColor: Colors.red,
-                                    label: 'Create Event',
-                                  ),
-                                  const SizedBox(width: 32),
-                                  QuickActionButton(
-                                    icon: Icons.cloud_upload_outlined,
-                                    color: const Color(0xFFE0F2FE),
-                                    iconColor: Colors.blue,
-                                    label: 'Upload Doc',
-                                  ),
-                                  const SizedBox(width: 32),
-                                  QuickActionButton(
                                     icon: Icons.notifications_none_outlined,
                                     color: const Color(0xFFE8F5E9),
                                     iconColor: Colors.green,
