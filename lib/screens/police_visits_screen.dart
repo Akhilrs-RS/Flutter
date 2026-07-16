@@ -19,6 +19,21 @@ class APMSPoliceVisitsScreen extends StatefulWidget {
 class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
   List<Map<String, dynamic>> _allVisits = [];
 
+  Color _parseColor(dynamic val, Color defaultColor) {
+    if (val is Color) return val;
+    if (val is String) {
+      final cleaned = val.replaceAll('#', '').replaceAll('0x', '');
+      final parsed = int.tryParse(cleaned, radix: 16);
+      if (parsed != null) {
+        if (cleaned.length == 6) {
+          return Color(parsed + 0xFF000000);
+        }
+        return Color(parsed);
+      }
+    }
+    return defaultColor;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -248,13 +263,13 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                       const SizedBox(height: 24),
                       ..._allVisits.map((v) {
                         return _buildVisitCard(
-                          title: v['title'] as String,
-                          subtitle: v['subtitle'] as String,
-                          tagText: v['tagText'] as String,
-                          tagBgColor: Color(int.parse(v['tagBgColor'] as String)),
-                          tagTextColor: Color(int.parse(v['tagTextColor'] as String)),
-                          caseInfo: v['caseInfo'] as String,
-                          timeInfo: v['timeInfo'] as String,
+                          title: v['title']?.toString() ?? 'N/A',
+                          subtitle: v['subtitle']?.toString() ?? 'N/A',
+                          tagText: v['tagText']?.toString() ?? 'Visit',
+                          tagBgColor: _parseColor(v['tagBgColor'], const Color(0xFFE0F2FE)),
+                          tagTextColor: _parseColor(v['tagTextColor'], const Color(0xFF0369A1)),
+                          caseInfo: v['caseInfo']?.toString() ?? '',
+                          timeInfo: v['timeInfo']?.toString() ?? '',
                         );
                       }),
                       const SizedBox(height: 8),
@@ -362,13 +377,13 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
   Widget _buildDesktopLayout(BuildContext context) {
     final visits = _allVisits.map((v) {
       return _buildVisitCard(
-        title: v['title'] as String,
-        subtitle: v['subtitle'] as String,
-        tagText: v['tagText'] as String,
-        tagBgColor: Color(int.parse(v['tagBgColor'] as String)),
-        tagTextColor: Color(int.parse(v['tagTextColor'] as String)),
-        caseInfo: v['caseInfo'] as String,
-        timeInfo: v['timeInfo'] as String,
+        title: v['title']?.toString() ?? 'N/A',
+        subtitle: v['subtitle']?.toString() ?? 'N/A',
+        tagText: v['tagText']?.toString() ?? 'Visit',
+        tagBgColor: _parseColor(v['tagBgColor'], const Color(0xFFE0F2FE)),
+        tagTextColor: _parseColor(v['tagTextColor'], const Color(0xFF0369A1)),
+        caseInfo: v['caseInfo']?.toString() ?? '',
+        timeInfo: v['timeInfo']?.toString() ?? '',
       );
     }).toList();
 

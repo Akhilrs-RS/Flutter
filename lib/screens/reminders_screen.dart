@@ -16,6 +16,21 @@ class APMSRemindersScreen extends StatefulWidget {
 class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
   List<Map<String, dynamic>> _allReminders = [];
 
+  Color _parseColor(dynamic val, Color defaultColor) {
+    if (val is Color) return val;
+    if (val is String) {
+      final cleaned = val.replaceAll('#', '').replaceAll('0x', '');
+      final parsed = int.tryParse(cleaned, radix: 16);
+      if (parsed != null) {
+        if (cleaned.length == 6) {
+          return Color(parsed + 0xFF000000);
+        }
+        return Color(parsed);
+      }
+    }
+    return defaultColor;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -353,16 +368,16 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
   }
 
   Widget _buildDesktopReminderCard(Map<String, dynamic> r) {
-    final title = r['title'] as String;
-    final priority = r['priority'] as String;
-    final priorityBg = r['priorityBg'] as Color;
-    final priorityText = r['priorityText'] as Color;
-    final time = r['time'] as String;
-    final tag = r['tag'] as String;
-    final tagBg = r['tagBg'] as Color;
-    final tagText = r['tagText'] as Color;
-    final subtitle = r['subtitle'] as String;
-    final isCompleted = r['isCompleted'] as bool;
+    final title = r['title']?.toString() ?? 'N/A';
+    final priority = r['priority']?.toString() ?? 'Medium';
+    final priorityBg = _parseColor(r['priorityBg'], const Color(0xFFFEF3C7));
+    final priorityText = _parseColor(r['priorityText'], const Color(0xFFD97706));
+    final time = r['time']?.toString() ?? '';
+    final tag = r['tag']?.toString() ?? 'Task';
+    final tagBg = _parseColor(r['tagBg'], const Color(0xFFECFDF5));
+    final tagText = _parseColor(r['tagText'], const Color(0xFF059669));
+    final subtitle = r['subtitle']?.toString() ?? '';
+    final isCompleted = r['isCompleted'] as bool? ?? false;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -554,16 +569,16 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
   }
 
   Widget _buildReminderCard(Map<String, dynamic> r) {
-    final title = r['title'] as String;
-    final priority = r['priority'] as String;
-    final priorityBg = r['priorityBg'] as Color;
-    final priorityText = r['priorityText'] as Color;
-    final time = r['time'] as String;
-    final tag = r['tag'] as String;
-    final tagBg = r['tagBg'] as Color;
-    final tagText = r['tagText'] as Color;
-    final subtitle = r['subtitle'] as String;
-    final isCompleted = r['isCompleted'] as bool;
+    final title = r['title']?.toString() ?? 'N/A';
+    final priority = r['priority']?.toString() ?? 'Medium';
+    final priorityBg = _parseColor(r['priorityBg'], const Color(0xFFFEF3C7));
+    final priorityText = _parseColor(r['priorityText'], const Color(0xFFD97706));
+    final time = r['time']?.toString() ?? '';
+    final tag = r['tag']?.toString() ?? 'Task';
+    final tagBg = _parseColor(r['tagBg'], const Color(0xFFECFDF5));
+    final tagText = _parseColor(r['tagText'], const Color(0xFF059669));
+    final subtitle = r['subtitle']?.toString() ?? '';
+    final isCompleted = r['isCompleted'] as bool? ?? false;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

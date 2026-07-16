@@ -67,8 +67,8 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
           if (h['isToday'] == true) {
             schedule.add({
               'time': '${h['time'] ?? ''} ${h['period'] ?? ''}',
-              'title': h['title'] as String,
-              'subtitle': h['court'] as String,
+              'title': h['title']?.toString() ?? 'Hearing',
+              'subtitle': h['court']?.toString() ?? 'N/A',
               'tag': 'Hearing',
               'color': Colors.blue,
             });
@@ -77,9 +77,9 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
         for (var v in visits) {
           if (v['tagText'] == 'Scheduled') {
             schedule.add({
-              'time': (v['timeInfo'] as String).split(' . ').first,
-              'title': v['title'] as String,
-              'subtitle': v['subtitle'] as String,
+              'time': (v['timeInfo']?.toString() ?? 'N/A').split(' . ').first,
+              'title': v['title']?.toString() ?? 'Visit',
+              'subtitle': v['subtitle']?.toString() ?? 'N/A',
               'tag': 'Police',
               'color': Colors.orange,
             });

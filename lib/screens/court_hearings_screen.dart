@@ -421,13 +421,15 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
   }
 
   Widget _buildHearingCard(Map<String, dynamic> h) {
-    final caseNo = h['caseNo'] as String;
-    final client = h['client'] as String;
-    final tag = h['tag'] as String;
-    final court = h['court'] as String;
-    final time = h['time'] as String;
-    final isCompleted = h['isCompleted'] as bool;
-    final note = h['note'] as String?;
+    final caseNo = h['caseNo']?.toString() ?? '';
+    final client = (h['client'] ?? h['title'] ?? 'N/A').toString();
+    final tag = (h['tag'] ?? h['tag2'] ?? 'Hearing').toString();
+    final court = h['court']?.toString() ?? 'N/A';
+    final time = h['time'] != null && h['period'] != null
+        ? '${h['time']} ${h['period']}'
+        : (h['time']?.toString() ?? 'N/A');
+    final isCompleted = h['isCompleted'] as bool? ?? false;
+    final note = h['note']?.toString();
 
     Color tagBgColor;
     Color tagTextColor;

@@ -17,6 +17,21 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
 
   List<Map<String, dynamic>> _allClients = [];
 
+  Color _parseColor(dynamic val, Color defaultColor) {
+    if (val is Color) return val;
+    if (val is String) {
+      final cleaned = val.replaceAll('#', '').replaceAll('0x', '');
+      final parsed = int.tryParse(cleaned, radix: 16);
+      if (parsed != null) {
+        if (cleaned.length == 6) {
+          return Color(parsed + 0xFF000000);
+        }
+        return Color(parsed);
+      }
+    }
+    return defaultColor;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -294,16 +309,16 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
                       const SizedBox(height: 24),
                       ...filteredClients.map((c) {
                         return ClientListItemCard(
-                          name: c['name'] as String,
-                          caseType: c['caseType'] as String,
-                          tagText: c['tagText'] as String,
-                          tagBgColor: c['tagBgColor'] as Color,
-                          tagTextColor: c['tagTextColor'] as Color,
-                          activeCases: c['activeCases'] as String,
-                          rightLabel: c['rightLabel'] as String,
-                          rightValue: c['rightValue'] as String,
-                          rightValueColor: c['rightValueColor'] as Color,
-                          imageUrl: c['imageUrl'] as String,
+                          name: c['name']?.toString() ?? 'N/A',
+                          caseType: c['caseType']?.toString() ?? 'N/A',
+                          tagText: c['tagText']?.toString() ?? '',
+                          tagBgColor: _parseColor(c['tagBgColor'], const Color(0xFFEFF6FF)),
+                          tagTextColor: _parseColor(c['tagTextColor'], const Color(0xFF2563EB)),
+                          activeCases: c['activeCases']?.toString() ?? '0 Active',
+                          rightLabel: c['rightLabel']?.toString() ?? 'Fee',
+                          rightValue: c['rightValue']?.toString() ?? '\$0.00',
+                          rightValueColor: _parseColor(c['rightValueColor'], const Color(0xFF6B7280)),
+                          imageUrl: c['imageUrl']?.toString() ?? '',
                         );
                       }),
                     ],
@@ -411,16 +426,16 @@ class _APMSClientsScreenState extends State<APMSClientsScreen> {
                       return SizedBox(
                         width: cardWidth,
                         child: ClientListItemCard(
-                          name: c['name'] as String,
-                          caseType: c['caseType'] as String,
-                          tagText: c['tagText'] as String,
-                          tagBgColor: c['tagBgColor'] as Color,
-                          tagTextColor: c['tagTextColor'] as Color,
-                          activeCases: c['activeCases'] as String,
-                          rightLabel: c['rightLabel'] as String,
-                          rightValue: c['rightValue'] as String,
-                          rightValueColor: c['rightValueColor'] as Color,
-                          imageUrl: c['imageUrl'] as String,
+                          name: c['name']?.toString() ?? 'N/A',
+                          caseType: c['caseType']?.toString() ?? 'N/A',
+                          tagText: c['tagText']?.toString() ?? '',
+                          tagBgColor: _parseColor(c['tagBgColor'], const Color(0xFFEFF6FF)),
+                          tagTextColor: _parseColor(c['tagTextColor'], const Color(0xFF2563EB)),
+                          activeCases: c['activeCases']?.toString() ?? '0 Active',
+                          rightLabel: c['rightLabel']?.toString() ?? 'Fee',
+                          rightValue: c['rightValue']?.toString() ?? '\$0.00',
+                          rightValueColor: _parseColor(c['rightValueColor'], const Color(0xFF6B7280)),
+                          imageUrl: c['imageUrl']?.toString() ?? '',
                         ),
                       );
                     }).toList(),

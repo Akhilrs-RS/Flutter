@@ -30,10 +30,10 @@ class _APMSCalendarScreenState extends State<APMSCalendarScreen> {
         setState(() {
           _todayEvents = hearings.map((h) {
             return {
-              'time': h['time'] as String,
-              'title': h['title'] as String,
-              'subtitle': h['court'] as String,
-              'accentColor': h['accentColor'] as String,
+              'time': h['time']?.toString() ?? '',
+              'title': h['title']?.toString() ?? 'Hearing',
+              'subtitle': h['court']?.toString() ?? 'N/A',
+              'accentColor': h['accentColor']?.toString() ?? '0xFF2563EB',
             };
           }).toList();
         });
