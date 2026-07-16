@@ -10,7 +10,6 @@ import 'package:advocate_app/screens/add_case_screen.dart';
 import 'package:advocate_app/screens/police_visits_screen.dart';
 import 'package:advocate_app/screens/court_hearings_screen.dart';
 import 'package:advocate_app/screens/reminders_screen.dart';
-import 'package:advocate_app/screens/evidence_screen.dart';
 import 'package:advocate_app/services/api_service.dart';
 
 class APMSHomeScreen extends StatefulWidget {
@@ -578,13 +577,13 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                             },
                           ),
                           QuickActionButton(
-                            icon: Icons.description_outlined,
-                            color: const Color(0xFFE0F2FE),
-                            iconColor: Colors.lightBlue,
-                            label: 'Documents',
+                            icon: Icons.gavel_outlined,
+                            color: const Color(0xFFF5F3FF),
+                            iconColor: Colors.purple,
+                            label: 'Scheduled Hearings',
                             onTap: () {
                               Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => const APMSEvidenceScreen()),
+                                MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
                               );
                             },
                           ),
@@ -1056,8 +1055,8 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                                   ),
                                   QuickActionButton(
                                     icon: Icons.gavel_outlined,
-                                    color: const Color(0xFFE0F2FE),
-                                    iconColor: Colors.lightBlue,
+                                    color: const Color(0xFFF5F3FF),
+                                    iconColor: Colors.purple,
                                     label: 'Scheduled Hearings',
                                     onTap: () {
                                       Navigator.of(context).push(

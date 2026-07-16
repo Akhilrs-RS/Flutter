@@ -134,11 +134,29 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
                         onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFE5E7EB), width: 1.2),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.add, color: Colors.black, size: 14),
+                            SizedBox(width: 4),
+                            Text(
+                              'Add',
+                              style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -321,7 +339,7 @@ class _APMSCourtHearingsScreenState extends State<APMSCourtHearingsScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Court Hearings',
+                    'Schedule Hearings',
                     style: TextStyle(
                       color: Color(0xFF0F1E36),
                       fontSize: 20,

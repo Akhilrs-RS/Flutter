@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:advocate_app/screens/home_screen.dart';
 import 'package:advocate_app/screens/cases_screen.dart';
+import 'package:advocate_app/screens/court_hearings_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/clients_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
@@ -1585,9 +1586,9 @@ class DesktopSidebar extends StatelessWidget {
                 _buildMenuItem(context, 'Dashboard', Icons.grid_view_rounded, const APMSHomeScreen()),
                 _buildMenuItem(context, 'Cases', Icons.gavel_outlined, const APMSCasesScreen()),
                 _buildMenuItem(context, 'Clients', Icons.people_outline, const APMSClientsScreen()),
-                _buildMenuItem(context, 'Hearings', Icons.gavel_outlined, const APMSCalendarScreen()),
+                _buildMenuItem(context, 'Hearings', Icons.gavel_outlined, const APMSCourtHearingsScreen()),
                 _buildMenuItem(context, 'Calendar', Icons.calendar_month_outlined, const APMSCalendarScreen()),
-                _buildMenuItem(context, 'Documents', Icons.description_outlined, null),
+                _buildMenuItem(context, 'Scheduled Hearings', Icons.gavel_outlined, const APMSCourtHearingsScreen()),
                 _buildMenuItem(context, 'Notifications', Icons.notifications_none_outlined, const APMSNotificationsScreen()),
                 _buildMenuItem(context, 'Police Visits', Icons.shield_outlined, const APMSPoliceVisitsScreen()),
                 _buildMenuItem(context, 'Tasks', Icons.checklist_outlined, const APMSRemindersScreen()),
