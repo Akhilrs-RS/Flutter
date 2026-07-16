@@ -580,7 +580,7 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                             icon: Icons.gavel_outlined,
                             color: const Color(0xFFF5F3FF),
                             iconColor: Colors.purple,
-                            label: 'Scheduled Hearings',
+                            label: 'Schedule Hearings',
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
@@ -1057,7 +1057,7 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                                     icon: Icons.gavel_outlined,
                                     color: const Color(0xFFF5F3FF),
                                     iconColor: Colors.purple,
-                                    label: 'Scheduled Hearings',
+                                    label: 'Schedule Hearings',
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
