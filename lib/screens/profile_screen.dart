@@ -4,9 +4,45 @@ import 'package:advocate_app/screens/sign_in_screen.dart';
 import 'package:advocate_app/screens/cases_screen.dart';
 import 'package:advocate_app/screens/calendar_screen.dart';
 import 'package:advocate_app/screens/notifications_screen.dart';
+import 'package:advocate_app/services/api_service.dart';
 
-class APMSProfileScreen extends StatelessWidget {
+class APMSProfileScreen extends StatefulWidget {
   const APMSProfileScreen({super.key});
+
+  @override
+  State<APMSProfileScreen> createState() => _APMSProfileScreenState();
+}
+
+class _APMSProfileScreenState extends State<APMSProfileScreen> {
+  String _name = 'Advocate';
+  String _enrollment = 'D/1421/2014';
+  String _practiceYears = '11 yrs';
+  int _casesCount = 0;
+  int _clientsCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileData();
+  }
+
+  void _fetchProfileData() async {
+    final user = await ApiService.getCurrentUser();
+    final cases = await ApiService.getCases();
+    final clients = await ApiService.getClients();
+
+    if (mounted) {
+      setState(() {
+        if (user.isNotEmpty) {
+          _name = user['name']?.toString() ?? 'Advocate';
+          _enrollment = user['enrollment']?.toString() ?? 'D/1421/2014';
+          _practiceYears = user['practiceYears']?.toString() ?? '11 yrs';
+        }
+        _casesCount = cases.length;
+        _clientsCount = clients.length;
+      });
+    }
+  }
 
   Widget _buildStatItem(String val, String label) {
     return Column(
@@ -96,18 +132,18 @@ class APMSProfileScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'Adv. Aditi Rao',
-                              style: TextStyle(
+                            Text(
+                              _name,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'Enrollment No . D/1421/2014',
-                              style: TextStyle(
+                            Text(
+                              'Enrollment No . $_enrollment',
+                              style: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 13,
                               ),
@@ -159,11 +195,11 @@ class APMSProfileScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Row(
                           children: [
-                            Expanded(child: _buildStatItem('64', 'Cases')),
+                            Expanded(child: _buildStatItem(_casesCount.toString(), 'Cases')),
                             Container(width: 1, height: 28, color: const Color(0xFFE5E7EB)),
-                            Expanded(child: _buildStatItem('128', 'Clients')),
+                            Expanded(child: _buildStatItem(_clientsCount.toString(), 'Clients')),
                             Container(width: 1, height: 28, color: const Color(0xFFE5E7EB)),
-                            Expanded(child: _buildStatItem('11 yrs', 'Practice')),
+                            Expanded(child: _buildStatItem(_practiceYears, 'Practice')),
                           ],
                         ),
                       ),
@@ -480,18 +516,18 @@ class APMSProfileScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Adv. Aditi Rao',
-                            style: TextStyle(
+                          Text(
+                            _name,
+                            style: const TextStyle(
                               color: Color(0xFF0F1E36),
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Enrollment No . D/1421/2014',
-                            style: TextStyle(
+                          Text(
+                            'Enrollment No . $_enrollment',
+                            style: const TextStyle(
                               color: Color(0xFF6B7280),
                               fontSize: 13,
                             ),
@@ -502,9 +538,9 @@ class APMSProfileScreen extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildStatItem('64', 'Cases'),
-                              _buildStatItem('128', 'Clients'),
-                              _buildStatItem('11 yrs', 'Practice'),
+                              _buildStatItem(_casesCount.toString(), 'Cases'),
+                              _buildStatItem(_clientsCount.toString(), 'Clients'),
+                              _buildStatItem(_practiceYears, 'Practice'),
                             ],
                           ),
                         ],

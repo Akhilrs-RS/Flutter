@@ -238,4 +238,19 @@ class ApiService {
     }
     return {'success': false, 'message': 'Connection error.'};
   }
+
+  static Future<Map<String, dynamic>> getCurrentUser() async {
+    try {
+      final res = await http.get(Uri.parse('$baseUrl/auth/me'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body) as Map<String, dynamic>;
+        if (data['success'] == true) {
+          return data['user'] as Map<String, dynamic>;
+        }
+      }
+    } catch (e) {
+      print('Network error fetching current user: $e');
+    }
+    return {};
+  }
 }

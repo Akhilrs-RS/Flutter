@@ -204,18 +204,18 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Total Active Docket',
                   style: TextStyle(
                     color: Color(0xFF9CA3AF),
                     fontSize: 12,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  '14 active cases',
-                  style: TextStyle(
+                  '${_allCases.where((c) => c['status'] == 'Active').length} active cases',
+                  style: const TextStyle(
                     color: Color(0xFF0F1E36),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -253,18 +253,18 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Total Cases',
                   style: TextStyle(
                     color: Color(0xFF9CA3AF),
                     fontSize: 12,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
-                  '64 total cases',
-                  style: TextStyle(
+                  '${_allCases.length} total cases',
+                  style: const TextStyle(
                     color: Color(0xFF0F1E36),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

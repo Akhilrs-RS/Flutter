@@ -20,12 +20,12 @@ class APMSHomeScreen extends StatefulWidget {
 }
 
 class _APMSHomeScreenState extends State<APMSHomeScreen> {
-  int _activeCasesCount = 47;
-  int _todayHearingsCount = 6;
-  int _policeVisitsCount = 3;
-  int _clientMeetingsCount = 4;
-  final String _pendingPaymentsAmount = "₹2.4L";
-  int _pendingTasksCount = 12;
+  int _activeCasesCount = 0;
+  int _todayHearingsCount = 0;
+  int _policeVisitsCount = 0;
+  int _clientMeetingsCount = 0;
+  String _pendingPaymentsAmount = "\$0";
+  int _pendingTasksCount = 0;
 
   List<Map<String, dynamic>> _todaySchedule = [];
 
@@ -44,21 +44,20 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
 
     if (mounted) {
       setState(() {
-        if (cases.isNotEmpty) {
-          _activeCasesCount = cases.where((c) => c['status'] == 'Active').length;
+        _activeCasesCount = cases.where((c) => c['status'] == 'Active').length;
+        _todayHearingsCount = hearings.where((h) => h['isToday'] == true).length;
+        _policeVisitsCount = visits.where((v) => v['tagText'] != 'Completed').length;
+        _clientMeetingsCount = clients.length;
+        _pendingTasksCount = reminders.where((r) => r['isCompleted'] == false).length;
+
+        double totalFee = 0.0;
+        for (var c in clients) {
+          if (c['rightLabel'] == 'Pending Fee') {
+            final valStr = c['rightValue']?.toString().replaceAll(r'$', '').replaceAll(',', '') ?? '0';
+            totalFee += double.tryParse(valStr) ?? 0.0;
+          }
         }
-        if (hearings.isNotEmpty) {
-          _todayHearingsCount = hearings.where((h) => h['isToday'] == true).length;
-        }
-        if (visits.isNotEmpty) {
-          _policeVisitsCount = visits.where((v) => v['tagText'] != 'Completed').length;
-        }
-        if (clients.isNotEmpty) {
-          _clientMeetingsCount = clients.length;
-        }
-        if (reminders.isNotEmpty) {
-          _pendingTasksCount = reminders.where((r) => r['isCompleted'] == false).length;
-        }
+        _pendingPaymentsAmount = '\$${totalFee.toStringAsFixed(0)}';
         
         // Let's populate the today's schedule section
         final List<Map<String, dynamic>> schedule = [];

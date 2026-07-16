@@ -197,8 +197,8 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'Police Visits',
                           style: TextStyle(
                             color: Colors.white,
@@ -206,10 +206,10 @@ class _APMSPoliceVisitsScreenState extends State<APMSPoliceVisitsScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          '8 visits this month',
-                          style: TextStyle(
+                          '${_allVisits.length} visits this month',
+                          style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 12,
                           ),

@@ -105,6 +105,25 @@ class ApiRouter {
     });
 
     // 9. Auth endpoints
+    router.get('/api/auth/me', (Request request) {
+      if (_store.users.isNotEmpty) {
+        return _jsonResponse({
+          'success': true,
+          'user': {
+            'name': _store.users.first['name'],
+            'email': _store.users.first['email'],
+            'phone': _store.users.first['phone'],
+            'enrollment': _store.users.first['enrollment'] ?? 'D/1421/2014',
+            'practiceYears': _store.users.first['practiceYears'] ?? '11 yrs',
+          }
+        });
+      }
+      return Response.badRequest(body: jsonEncode({'success': false, 'message': 'No user profile found.'}), headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+    });
+
     router.post('/api/auth/register', (Request request) async {
       final body = await request.readAsString();
       final data = jsonDecode(body) as Map<String, dynamic>;

@@ -185,8 +185,8 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           'Reminders',
                           style: TextStyle(
                             color: Colors.white,
@@ -194,10 +194,10 @@ class _APMSRemindersScreenState extends State<APMSRemindersScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          '3 pending',
-                          style: TextStyle(
+                          '${_allReminders.where((r) => r['isCompleted'] == false).length} pending',
+                          style: const TextStyle(
                             color: Colors.white54,
                             fontSize: 12,
                           ),
