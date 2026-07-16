@@ -21,6 +21,21 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
 
   List<Map<String, dynamic>> _allCases = [];
 
+  Color _parseColor(dynamic val, Color defaultColor) {
+    if (val is Color) return val;
+    if (val is String) {
+      final cleaned = val.replaceAll('#', '').replaceAll('0x', '');
+      final parsed = int.tryParse(cleaned, radix: 16);
+      if (parsed != null) {
+        if (cleaned.length == 6) {
+          return Color(parsed + 0xFF000000);
+        }
+        return Color(parsed);
+      }
+    }
+    return defaultColor;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -113,11 +128,11 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
       case 'Active':
         return _allCases;
       case 'Hearing Today':
-        return _allCases.where((c) => c['isHearingToday'] as bool).toList();
+        return _allCases.where((c) => c['isHearingToday'] == true).toList();
       case 'Pending':
-        return _allCases.where((c) => c['isPending'] as bool).toList();
+        return _allCases.where((c) => c['isPending'] == true).toList();
       case 'Appealed':
-        return _allCases.where((c) => c['isAppealed'] as bool).toList();
+        return _allCases.where((c) => c['isAppealed'] == true).toList();
       default:
         return [];
     }
@@ -264,11 +279,11 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
   }
 
   Widget _buildCaseCardItem(BuildContext context, Map<String, dynamic> c) {
-    final status = c['status'] as String;
+    final status = c['status']?.toString() ?? 'Active';
     final isHearingTodayFilter = _selectedFilter == 'Hearing Today';
     final displayNextDate = isHearingTodayFilter && c.containsKey('nextDateToday')
-        ? c['nextDateToday'] as String
-        : c['nextDate'] as String;
+        ? c['nextDateToday']?.toString() ?? 'Today'
+        : c['nextDate']?.toString() ?? '';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -292,7 +307,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
             children: [
               Container(
                 width: 4,
-                color: c['leftStripColor'] as Color,
+                color: _parseColor(c['leftStripColor'], const Color(0xFF10B981)),
               ),
               Expanded(
                 child: Padding(
@@ -304,7 +319,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            c['caseNo'] as String,
+                            c['caseNo']?.toString() ?? '',
                             style: const TextStyle(
                               color: Color(0xFF9CA3AF),
                               fontSize: 12,
@@ -313,14 +328,14 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: c['statusBgColor'] as Color,
+                              color: _parseColor(c['statusBgColor'], const Color(0xFFD1FAE5)),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             child: Text(
                               status,
                               style: TextStyle(
-                                color: c['statusTextColor'] as Color,
+                                color: _parseColor(c['statusTextColor'], const Color(0xFF065F46)),
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -330,7 +345,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        c['title'] as String,
+                        c['title']?.toString() ?? 'Case',
                         style: const TextStyle(
                           color: Color(0xFF0F1E36),
                           fontSize: 16,
@@ -344,7 +359,7 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              c['court'] as String,
+                              c['court']?.toString() ?? 'N/A',
                               style: const TextStyle(color: Color(0xFF4B5563), fontSize: 12),
                             ),
                           ),
@@ -373,11 +388,11 @@ class _APMSCasesScreenState extends State<APMSCasesScreen> {
                             children: [
                               CircleAvatar(
                                 radius: 12,
-                                backgroundImage: NetworkImage(c['clientPhoto'] as String),
+                                backgroundImage: NetworkImage(c['clientPhoto']?.toString() ?? ''),
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                c['clientName'] as String,
+                                c['clientName']?.toString() ?? 'N/A',
                                 style: const TextStyle(
                                   color: Color(0xFF374151),
                                   fontSize: 12,
