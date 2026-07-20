@@ -136,6 +136,24 @@ class ApiRouter {
       return _jsonResponse({'success': true, 'data': data});
     });
 
+    router.put('/api/visits', (Request request) async {
+      final body = await request.readAsString();
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      final title = data['title'] as String;
+      
+      for (var visit in _store.visits) {
+        if (visit['title'] == title) {
+          if (data.containsKey('subtitle')) visit['subtitle'] = data['subtitle'];
+          if (data.containsKey('caseInfo')) visit['caseInfo'] = data['caseInfo'];
+          if (data.containsKey('timeInfo')) visit['timeInfo'] = data['timeInfo'];
+          if (data.containsKey('tagText')) visit['tagText'] = data['tagText'];
+          break;
+        }
+      }
+      await _store.save();
+      return _jsonResponse({'success': true});
+    });
+
     // 7. FIR details
     router.get('/api/fir', (Request request) {
       return _jsonResponse(_store.firDetails);

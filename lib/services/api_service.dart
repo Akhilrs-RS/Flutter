@@ -205,6 +205,20 @@ class ApiService {
     return false;
   }
 
+  static Future<bool> updateVisit(String title, Map<String, dynamic> updateData) async {
+    try {
+      final res = await http.put(
+        Uri.parse('$baseUrl/visits'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'title': title, ...updateData}),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      print('Network error updating visit: $e');
+    }
+    return false;
+  }
+
   // 7. FIR Details
   static Future<Map<String, dynamic>> getFIRDetails() async {
     try {
