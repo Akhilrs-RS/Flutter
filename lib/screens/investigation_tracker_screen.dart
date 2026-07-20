@@ -502,7 +502,11 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
       child: Row(
         children: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Activity added successfully!')),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
@@ -522,7 +526,11 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
           ),
           const SizedBox(width: 8),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Evidence uploaded successfully!')),
+              );
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFE5E7EB)),
               shape: RoundedRectangleBorder(
@@ -540,7 +548,11 @@ class _APMSInvestigationTrackerScreenState extends State<APMSInvestigationTracke
           ),
           const SizedBox(width: 8),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Follow-up scheduled!')),
+              );
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFE5E7EB)),
               shape: RoundedRectangleBorder(

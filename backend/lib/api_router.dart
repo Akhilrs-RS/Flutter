@@ -54,19 +54,30 @@ class ApiRouter {
       final body = await request.readAsString();
       final data = jsonDecode(body) as Map<String, dynamic>;
       final title = data['title'] as String;
-      final isCompleted = data['isCompleted'] as bool;
       
       for (var reminder in _store.reminders) {
         if (reminder['title'] == title) {
-          reminder['isCompleted'] = isCompleted;
-          if (isCompleted) {
-            reminder['subtitle'] = 'Completed';
-          } else {
-            reminder['subtitle'] = 'Pending';
+          if (data.containsKey('isCompleted')) {
+            final isCompleted = data['isCompleted'] as bool;
+            reminder['isCompleted'] = isCompleted;
+            reminder['subtitle'] = isCompleted ? 'Completed' : 'Pending';
+          }
+          if (data.containsKey('time')) {
+            reminder['time'] = data['time'];
           }
           break;
         }
       }
+      await _store.save();
+      return _jsonResponse({'success': true});
+    });
+
+    router.delete('/api/reminders', (Request request) async {
+      final body = await request.readAsString();
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      final title = data['title'] as String;
+      
+      _store.reminders.removeWhere((r) => r['title'] == title);
       await _store.save();
       return _jsonResponse({'success': true});
     });
@@ -79,6 +90,37 @@ class ApiRouter {
     // 5. Hearings endpoints
     router.get('/api/hearings', (Request request) {
       return _jsonResponse(_store.hearings);
+    });
+
+    router.post('/api/hearings', (Request request) async {
+      final body = await request.readAsString();
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      _store.hearings.insert(0, data);
+      await _store.save();
+      return _jsonResponse({'success': true, 'data': data});
+    });
+
+    router.put('/api/hearings', (Request request) async {
+      final body = await request.readAsString();
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      final caseNo = data['caseNo'] as String;
+      
+      for (var hearing in _store.hearings) {
+        if (hearing['caseNo'] == caseNo) {
+          if (data.containsKey('isCompleted')) {
+            hearing['isCompleted'] = data['isCompleted'] as bool;
+          }
+          if (data.containsKey('note')) {
+            hearing['note'] = data['note'];
+          }
+          if (data.containsKey('order')) {
+            hearing['order'] = data['order'];
+          }
+          break;
+        }
+      }
+      await _store.save();
+      return _jsonResponse({'success': true});
     });
 
     // 6. Visits endpoints

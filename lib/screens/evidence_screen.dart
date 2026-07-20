@@ -668,7 +668,11 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
       child: Row(
         children: [
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Activity added successfully!')),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
@@ -688,7 +692,11 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
           ),
           const SizedBox(width: 8),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Evidence uploaded successfully!')),
+              );
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFE5E7EB)),
               shape: RoundedRectangleBorder(
@@ -706,7 +714,11 @@ class _APMSEvidenceScreenState extends State<APMSEvidenceScreen> {
           ),
           const SizedBox(width: 8),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Follow-up scheduled!')),
+              );
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFE5E7EB)),
               shape: RoundedRectangleBorder(

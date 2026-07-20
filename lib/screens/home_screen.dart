@@ -464,36 +464,22 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
-                                );
-                              },
-                              child: OverviewCard(
-                                icon: Icons.gavel_outlined,
-                                color: const Color(0xFFF5F3FF),
-                                iconColor: Colors.purple,
-                                value: _todayHearingsCount.toString(),
-                                label: 'Today\'s Hearings',
-                              ),
+                            child: OverviewCard(
+                              icon: Icons.gavel_outlined,
+                              color: const Color(0xFFF5F3FF),
+                              iconColor: Colors.purple,
+                              value: _todayHearingsCount.toString(),
+                              label: 'Today\'s Hearings',
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => const APMSPoliceVisitsScreen()),
-                                );
-                              },
-                              child: OverviewCard(
-                                icon: Icons.shield_outlined,
-                                color: const Color(0xFFFFF7ED),
-                                iconColor: Colors.orange,
-                                value: _policeVisitsCount.toString(),
-                                label: 'Police Visits',
-                              ),
+                            child: OverviewCard(
+                              icon: Icons.shield_outlined,
+                              color: const Color(0xFFFFF7ED),
+                              iconColor: Colors.orange,
+                              value: _policeVisitsCount.toString(),
+                              label: 'Police Visits',
                             ),
                           ),
                         ],
@@ -522,19 +508,12 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(builder: (context) => const APMSRemindersScreen()),
-                                );
-                              },
-                              child: OverviewCard(
-                                icon: Icons.access_time,
-                                color: const Color(0xFFFEFCE8),
-                                iconColor: const Color(0xFFD97706),
-                                value: _pendingTasksCount.toString(),
-                                label: 'Pending Tasks',
-                              ),
+                            child: OverviewCard(
+                              icon: Icons.access_time,
+                              color: const Color(0xFFFEFCE8),
+                              iconColor: const Color(0xFFD97706),
+                              value: _pendingTasksCount.toString(),
+                              label: 'Pending Tasks',
                             ),
                           ),
                         ],
@@ -931,36 +910,22 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const APMSCourtHearingsScreen()),
-                        );
-                      },
-                      child: OverviewCard(
-                        icon: Icons.gavel_outlined,
-                        color: const Color(0xFFF5F3FF),
-                        iconColor: Colors.purple,
-                        value: _todayHearingsCount.toString(),
-                        label: 'Today\'s Hearings',
-                      ),
+                    child: OverviewCard(
+                      icon: Icons.gavel_outlined,
+                      color: const Color(0xFFF5F3FF),
+                      iconColor: Colors.purple,
+                      value: _todayHearingsCount.toString(),
+                      label: 'Today\'s Hearings',
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const APMSPoliceVisitsScreen()),
-                        );
-                      },
-                      child: OverviewCard(
-                        icon: Icons.shield_outlined,
-                        color: const Color(0xFFFFF7ED),
-                        iconColor: Colors.orange,
-                        value: _policeVisitsCount.toString(),
-                        label: 'Police Visits',
-                      ),
+                    child: OverviewCard(
+                      icon: Icons.shield_outlined,
+                      color: const Color(0xFFFFF7ED),
+                      iconColor: Colors.orange,
+                      value: _policeVisitsCount.toString(),
+                      label: 'Police Visits',
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -985,19 +950,12 @@ class _APMSHomeScreenState extends State<APMSHomeScreen> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const APMSRemindersScreen()),
-                        );
-                      },
-                      child: OverviewCard(
-                        icon: Icons.access_time,
-                        color: const Color(0xFFFEFCE8),
-                        iconColor: const Color(0xFFD97706),
-                        value: _pendingTasksCount.toString(),
-                        label: 'Pending Tasks',
-                      ),
+                    child: OverviewCard(
+                      icon: Icons.access_time,
+                      color: const Color(0xFFFEFCE8),
+                      iconColor: const Color(0xFFD97706),
+                      value: _pendingTasksCount.toString(),
+                      label: 'Pending Tasks',
                     ),
                   ),
                 ],

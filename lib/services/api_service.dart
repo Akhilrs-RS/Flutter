@@ -90,15 +90,33 @@ class ApiService {
   }
 
   static Future<bool> toggleReminderCompletion(String title, bool isCompleted) async {
+    return updateReminder(title, {'isCompleted': isCompleted});
+  }
+
+  static Future<bool> updateReminder(String title, Map<String, dynamic> updateData) async {
     try {
       final res = await http.put(
         Uri.parse('$baseUrl/reminders'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'title': title, 'isCompleted': isCompleted}),
+        body: jsonEncode({'title': title, ...updateData}),
       );
       return res.statusCode == 200;
     } catch (e) {
       print('Network error updating reminder: $e');
+    }
+    return false;
+  }
+
+  static Future<bool> deleteReminder(String title) async {
+    try {
+      final res = await http.delete(
+        Uri.parse('$baseUrl/reminders'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'title': title}),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      print('Network error deleting reminder: $e');
     }
     return false;
   }
@@ -129,6 +147,34 @@ class ApiService {
       print('Network error fetching hearings: $e');
     }
     return [];
+  }
+
+  static Future<bool> addHearing(Map<String, dynamic> hearingData) async {
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/hearings'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(hearingData),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      print('Network error adding hearing: $e');
+    }
+    return false;
+  }
+
+  static Future<bool> updateHearing(String caseNo, Map<String, dynamic> updateData) async {
+    try {
+      final res = await http.put(
+        Uri.parse('$baseUrl/hearings'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'caseNo': caseNo, ...updateData}),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      print('Network error updating hearing: $e');
+    }
+    return false;
   }
 
   // 6. Visits

@@ -385,7 +385,9 @@ class _APMSAddCaseScreenState extends State<APMSAddCaseScreen> {
                   ),
                   OutlinedButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => const APMSCasesScreen()),
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFD1D5DB)),
